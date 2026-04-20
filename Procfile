@@ -1,1 +1,1 @@
-worker: python oglasiq.py
+worker: playwright install chromium && python oglasiq.py
