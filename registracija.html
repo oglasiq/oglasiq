@@ -39,11 +39,10 @@
         .form-check a{color:var(--accent);text-decoration:none;}
         .btn-submit{width:100%;background:var(--accent);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
         .btn-submit:hover{opacity:0.85;}
+        .btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
         .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
         .divider-line{flex:1;height:1px;background:var(--border);}
         .divider span{font-size:12px;color:var(--muted);}
-        .social-btn{width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px;border-radius:10px;font-size:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
-        .social-btn:hover{border-color:#333;color:#fff;}
         .login-link{text-align:center;font-size:13px;color:var(--muted);margin-top:20px;}
         .login-link a{color:var(--accent);text-decoration:none;}
         .step-content{display:none;}
@@ -52,11 +51,12 @@
         .back-btn:hover{color:#fff;}
         .error-msg{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
         .error-msg.show{display:block;}
+        .success-msg{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);color:#86efac;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
+        .success-msg.show{display:block;}
         .verify-inputs{display:flex;gap:8px;justify-content:center;margin:20px 0;}
         .verify-input{width:48px;height:56px;background:var(--bg);border:1px solid var(--border);color:#fff;font-size:22px;font-weight:700;text-align:center;border-radius:8px;outline:none;}
         .verify-input:focus{border-color:var(--accent);}
 
-        /* PAKETI */
         .plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
         .plan-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.2s;text-align:left;position:relative;}
         .plan-card.selected{border-color:var(--accent);background:#1a1a3a;}
@@ -68,24 +68,23 @@
         .plan-features{font-size:11px;color:var(--muted);line-height:1.8;}
         .popular-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:9px;font-weight:600;padding:2px 10px;border-radius:10px;white-space:nowrap;}
 
-        /* OBVESTILA */
         .notif-options{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
         .notif-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;}
         .notif-card.selected{border-color:var(--accent);background:#1a1a3a;}
-        .notif-card.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none;}
         .notif-icon{font-size:20px;width:36px;text-align:center;}
         .notif-title{font-size:13px;font-weight:600;margin-bottom:2px;}
         .notif-desc{font-size:11px;color:var(--muted);}
-        .notif-lock{font-size:11px;color:#ef4444;margin-top:2px;}
         .notif-cb{margin-left:auto;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
         .notif-card.selected .notif-cb{background:var(--accent);border-color:var(--accent);}
 
-        /* SUCCESS */
         .success-wrap{text-align:center;padding:20px 0;}
         .success-icon{width:64px;height:64px;background:rgba(34,197,94,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
         .success-title{font-size:20px;font-weight:700;margin-bottom:8px;}
         .success-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
         .btn-dashboard{display:block;background:var(--accent);color:#fff;text-align:center;padding:12px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;}
+
+        .loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;}
+        @keyframes spin{to{transform:rotate(360deg);}}
 
         footer{padding:20px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
         footer p{font-size:12px;color:var(--muted);}
@@ -111,11 +110,11 @@
             <div class="step-dot" id="dot-4"></div>
         </div>
 
-        <!-- KORAK 1 -->
+        <!-- KORAK 1 — PODATKI -->
         <div class="step-content active" id="step-1">
             <div class="card-title">Ustvari račun</div>
             <div class="card-sub">Začni brezplačno. Ne potrebuješ kreditne kartice.</div>
-            <div class="error-msg" id="error-1">Prosim izpolni vsa polja.</div>
+            <div class="error-msg" id="error-1"></div>
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">Ime</label>
@@ -143,62 +142,53 @@
                 <input type="checkbox" id="pogoji">
                 <span>Strinjam se s <a href="#">pogoji uporabe</a> in <a href="#">politiko zasebnosti</a></span>
             </div>
-            <button class="btn-submit" onclick="korak1()">Naprej →</button>
-            <div class="divider"><div class="divider-line"></div><span>ali</span><div class="divider-line"></div></div>
-            <button class="social-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Nadaljuj z Google
-            </button>
+            <button class="btn-submit" id="btn-registracija" onclick="korak1()">Ustvari račun →</button>
             <div class="login-link">Že imaš račun? <a href="prijava.html">Prijava</a></div>
         </div>
 
-        <!-- KORAK 2 -->
+        <!-- KORAK 2 — EMAIL VERIFIKACIJA -->
         <div class="step-content" id="step-2">
-            <button class="back-btn" onclick="pojdiNa(1)">← Nazaj</button>
-            <div class="card-title">Potrdi email</div>
-            <div class="card-sub">Poslali smo 6-mestno kodo na <strong id="verify-email"></strong></div>
-            <div class="verify-inputs">
-                <input class="verify-input" maxlength="1" oninput="nextInput(this,1)">
-                <input class="verify-input" maxlength="1" oninput="nextInput(this,2)">
-                <input class="verify-input" maxlength="1" oninput="nextInput(this,3)">
-                <input class="verify-input" maxlength="1" oninput="nextInput(this,4)">
-                <input class="verify-input" maxlength="1" oninput="nextInput(this,5)">
-                <input class="verify-input" maxlength="1" oninput="nextInput(this,6)">
+            <div class="card-title">Potrdi email ✉️</div>
+            <div class="card-sub">Poslali smo potrditveni email na <strong id="verify-email"></strong>. Klikni na povezavo v emailu in se vrni sem.</div>
+            <div class="success-msg show" id="verify-status">
+                📬 Email je bil poslan! Preveri svojo pošto (tudi Spam mapo).
             </div>
-            <button class="btn-submit" onclick="korak2()">Potrdi →</button>
-            <div class="login-link" style="margin-top:16px;">Nisi prejel kode? <a href="#" onclick="alert('Koda poslana!')">Pošlji ponovno</a></div>
+            <button class="btn-submit" onclick="preveriVerifikacijo()">✅ Potrdil sem email — Naprej</button>
+            <div class="login-link" style="margin-top:16px;">
+                Nisi prejel emaila? <a href="#" onclick="posljiPonovnoEmail()">Pošlji ponovno</a>
+            </div>
         </div>
 
         <!-- KORAK 3 — PAKETI -->
         <div class="step-content" id="step-3">
             <button class="back-btn" onclick="pojdiNa(2)">← Nazaj</button>
             <div class="card-title">Izberi paket</div>
-            <div class="card-sub">Začni brezplačno, nadgradi kadarkoli. Brez vezave.</div>
+            <div class="card-sub">Začni brezplačno, nadgradi kadarkoli.</div>
             <div class="plan-grid">
                 <div class="plan-card selected" onclick="izberPaket(this,'free')">
                     <div class="plan-name">Free</div>
                     <div class="plan-price">0€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
                     <div class="plan-interval">⏱ Vsake 24 ur</div>
-                    <div class="plan-features">✓ 1 URL iskanje<br>✓ Email obvestila<br>✓ 7 dni zgodovina</div>
+                    <div class="plan-features">✓ 1 iskanje<br>✓ Email obvestila<br>✓ 7 dni zgodovina</div>
                 </div>
                 <div class="plan-card" onclick="izberPaket(this,'starter')">
                     <div class="plan-name">Starter</div>
                     <div class="plan-price">3€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
                     <div class="plan-interval">⏱ Vsake 3 ure</div>
-                    <div class="plan-features">✓ 2 URL iskanja<br>✓ Telegram + Email<br>✓ 30 dni zgodovina</div>
+                    <div class="plan-features">✓ 2 iskanja<br>✓ Telegram + Email<br>✓ 30 dni zgodovina</div>
                 </div>
                 <div class="plan-card" onclick="izberPaket(this,'pro')" style="position:relative;">
                     <div class="popular-tag">Najbolj priljubljen</div>
                     <div class="plan-name">Pro</div>
                     <div class="plan-price">7€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
                     <div class="plan-interval">⏱ Vsako uro</div>
-                    <div class="plan-features">✓ 4 URL iskanja<br>✓ Telegram + Email<br>✓ Sprememba cene</div>
+                    <div class="plan-features">✓ 4 iskanja<br>✓ Telegram + Email<br>✓ Sprememba cene</div>
                 </div>
                 <div class="plan-card" onclick="izberPaket(this,'premium')">
                     <div class="plan-name">Premium</div>
                     <div class="plan-price">15€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
                     <div class="plan-interval">⏱ Vsake 20 min</div>
-                    <div class="plan-features">✓ 5 URL iskanj<br>✓ Telegram + Email<br>✓ Neomejena zgodovina</div>
+                    <div class="plan-features">✓ 5 iskanj<br>✓ Telegram + Email<br>✓ Neomejena zgodovina</div>
                 </div>
             </div>
             <button class="btn-submit" onclick="korak3()">Naprej →</button>
@@ -209,10 +199,9 @@
             <button class="back-btn" onclick="pojdiNa(3)">← Nazaj</button>
             <div class="card-title">Kako te obvestimo?</div>
             <div class="card-sub" id="notif-sub">Izberi način prejemanja obvestil.</div>
-            <div class="notif-options" id="notif-options">
-                <!-- Dinamično glede na paket -->
-            </div>
-            <button class="btn-submit" onclick="korak4()">Dokončaj registracijo →</button>
+            <div class="error-msg" id="error-4"></div>
+            <div class="notif-options" id="notif-options"></div>
+            <button class="btn-submit" id="btn-dokoncaj" onclick="korak4()">Dokončaj registracijo →</button>
         </div>
 
         <!-- USPEH -->
@@ -240,45 +229,54 @@
     </div>
 </footer>
 
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
+// ===== SUPABASE CONFIG =====
+const SUPABASE_URL = 'https://mzcygmkvqqmsoufptinm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16Y3lnbWt2cXFtc291ZnB0aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2OTY2MDMsImV4cCI6MjA5MjI3MjYwM30.u0UWS-URLgUu9zifPR197S-tRCpGJAIf-9XYJlHCLbA';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 let trenutniKorak = 1;
 let izbranPaket = 'free';
+let izbranNotif = 'email';
+let registriranEmail = '';
 
 const paketObvestila = {
     free: {
-        opcije: [
-            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true}
-        ],
+        opcije: [{icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email'}],
         sub: 'Free paket vključuje email obvestila.'
     },
     starter: {
         opcije: [
-            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram', dostopno:true},
-            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true},
-            {icon:'🔔', title:'Oboje', desc:'Telegram + Email obvestila', id:'oboje', dostopno:true}
+            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram'},
+            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email'},
+            {icon:'🔔', title:'Oboje', desc:'Telegram + Email obvestila', id:'oboje'}
         ],
         sub: 'Starter paket vključuje Telegram in Email obvestila.'
     },
     pro: {
         opcije: [
-            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram', dostopno:true},
-            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true},
-            {icon:'🔔', title:'Oboje', desc:'Telegram + Email obvestila', id:'oboje', dostopno:true}
+            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram'},
+            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email'},
+            {icon:'🔔', title:'Oboje', desc:'Telegram + Email obvestila', id:'oboje'}
         ],
         sub: 'Pro paket vključuje Telegram in Email obvestila.'
     },
     premium: {
         opcije: [
-            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram', dostopno:true},
-            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true},
-            {icon:'🔔', title:'Oboje', desc:'Telegram + Email — Priporočeno', id:'oboje', dostopno:true}
+            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram'},
+            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email'},
+            {icon:'🔔', title:'Oboje', desc:'Telegram + Email — Priporočeno', id:'oboje'}
         ],
         sub: 'Premium paket vključuje vse načine obvestil.'
     }
 };
 
 function pojdiNa(korak) {
-    document.getElementById('step-' + trenutniKorak).classList.remove('active');
+    const trenutni = document.getElementById('step-' + (korak === 'success' ? 'success' : trenutniKorak));
+    if(trenutni) trenutni.classList.remove('active');
+
     if(korak === 'success') {
         document.getElementById('step-success').classList.add('active');
         for(let i=1;i<=4;i++) document.getElementById('dot-'+i).classList.add('done');
@@ -294,38 +292,102 @@ function pojdiNa(korak) {
     }
 }
 
-function korak1() {
-    const ime = document.getElementById('ime').value;
-    const priimek = document.getElementById('priimek').value;
-    const email = document.getElementById('email').value;
+// ===== KORAK 1 — PRAVA REGISTRACIJA =====
+async function korak1() {
+    const ime = document.getElementById('ime').value.trim();
+    const priimek = document.getElementById('priimek').value.trim();
+    const email = document.getElementById('email').value.trim();
     const geslo = document.getElementById('geslo').value;
     const pogoji = document.getElementById('pogoji').checked;
     const error = document.getElementById('error-1');
-    if(!ime||!priimek||!email||!geslo||!pogoji) {
-        error.classList.add('show');
-        error.textContent = !pogoji ? 'Strinjati se moraš s pogoji.' : 'Prosim izpolni vsa polja.';
-        return;
+    const btn = document.getElementById('btn-registracija');
+
+    if(!ime||!priimek||!email||!geslo) {
+        error.textContent = 'Prosim izpolni vsa polja.';
+        error.classList.add('show'); return;
+    }
+    if(!pogoji) {
+        error.textContent = 'Strinjati se moraš s pogoji uporabe.';
+        error.classList.add('show'); return;
     }
     if(geslo.length < 8) {
-        error.classList.add('show');
         error.textContent = 'Geslo mora imeti najmanj 8 znakov.';
-        return;
+        error.classList.add('show'); return;
     }
     error.classList.remove('show');
-    document.getElementById('verify-email').textContent = email;
-    pojdiNa(2);
+
+    // Pokažemo loading
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span>Ustvarjam račun...';
+
+    try {
+        // Registracija v Supabase Auth
+        const { data, error: authError } = await sb.auth.signUp({
+            email: email,
+            password: geslo,
+            options: {
+                data: { ime: ime, priimek: priimek }
+            }
+        });
+
+        if(authError) {
+            let msg = 'Napaka pri registraciji.';
+            if(authError.message.includes('already registered')) msg = 'Ta email je že registriran. Poskusi s prijavo.';
+            if(authError.message.includes('invalid')) msg = 'Neveljaven email naslov.';
+            error.textContent = msg;
+            error.classList.add('show');
+            btn.disabled = false;
+            btn.innerHTML = 'Ustvari račun →';
+            return;
+        }
+
+        // Shrani v tabelo uporabniki
+        if(data.user) {
+            await sb.from('uporabniki').insert({
+                id: data.user.id,
+                email: email,
+                ime: ime,
+                priimek: priimek,
+                paket: 'free'
+            });
+        }
+
+        registriranEmail = email;
+        document.getElementById('verify-email').textContent = email;
+        btn.disabled = false;
+        btn.innerHTML = 'Ustvari račun →';
+        pojdiNa(2);
+
+    } catch(e) {
+        error.textContent = 'Napaka: ' + e.message;
+        error.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = 'Ustvari račun →';
+    }
 }
 
-function korak2() {
-    const inputs = document.querySelectorAll('.verify-input');
-    let koda = '';
-    inputs.forEach(i => koda += i.value);
-    if(koda.length < 6) { alert('Vnesi 6-mestno kodo.'); return; }
-    pojdiNa(3);
+// ===== KORAK 2 — PREVERI VERIFIKACIJO =====
+async function preveriVerifikacijo() {
+    const { data: { session } } = await sb.auth.getSession();
+    if(session) {
+        pojdiNa(3);
+    } else {
+        const status = document.getElementById('verify-status');
+        status.textContent = '⏳ Email še ni potrjen. Klikni na povezavo v emailu in poskusi znova.';
+        status.style.background = 'rgba(245,158,11,0.1)';
+        status.style.borderColor = 'rgba(245,158,11,0.2)';
+        status.style.color = '#fcd34d';
+    }
 }
 
+async function posljiPonovnoEmail() {
+    if(!registriranEmail) return;
+    await sb.auth.resend({ type: 'signup', email: registriranEmail });
+    alert('Email je bil poslan ponovno!');
+}
+
+// ===== KORAK 3 — PAKETI =====
 function korak3() {
-    // Pripravi obvestila glede na paket
     const config = paketObvestila[izbranPaket];
     document.getElementById('notif-sub').textContent = config.sub;
     const container = document.getElementById('notif-options');
@@ -333,7 +395,7 @@ function korak3() {
     config.opcije.forEach((op, idx) => {
         const div = document.createElement('div');
         div.className = 'notif-card' + (idx === 0 ? ' selected' : '');
-        div.onclick = () => izberNotif(div);
+        div.onclick = () => { izberNotif(div); izbranNotif = op.id; };
         div.innerHTML = `
             <div class="notif-icon">${op.icon}</div>
             <div>
@@ -345,15 +407,45 @@ function korak3() {
             </div>`;
         container.appendChild(div);
     });
+    izbranNotif = config.opcije[0].id;
     pojdiNa(4);
 }
 
-function korak4() {
-    const sub = izbranPaket === 'free'
-        ? 'Tvoj Free račun je aktiven. Nastavi iskanje in začni prejemati obvestila!'
-        : `Tvoj ${izbranPaket.charAt(0).toUpperCase()+izbranPaket.slice(1)} račun je aktiven. Uživaj v naprednih funkcijah!`;
-    document.getElementById('success-sub').textContent = sub;
-    pojdiNa('success');
+// ===== KORAK 4 — SHRANI PAKET =====
+async function korak4() {
+    const btn = document.getElementById('btn-dokoncaj');
+    const error = document.getElementById('error-4');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span>Shranjujem...';
+
+    try {
+        const { data: { user } } = await sb.auth.getUser();
+        if(user) {
+            await sb.from('uporabniki').update({
+                paket: izbranPaket,
+                notif: izbranNotif
+            }).eq('id', user.id);
+        }
+
+        // Shrani v localStorage za dashboard
+        localStorage.setItem('oglasiq_paket', izbranPaket);
+        localStorage.setItem('oglasiq_notif', izbranNotif);
+
+        const sub = izbranPaket === 'free'
+            ? 'Tvoj Free račun je aktiven. Nastavi iskanje in začni prejemati obvestila!'
+            : `Tvoj ${izbranPaket.charAt(0).toUpperCase()+izbranPaket.slice(1)} račun je aktiven!`;
+        document.getElementById('success-sub').textContent = sub;
+
+        btn.disabled = false;
+        btn.innerHTML = 'Dokončaj registracijo →';
+        pojdiNa('success');
+
+    } catch(e) {
+        error.textContent = 'Napaka: ' + e.message;
+        error.classList.add('show');
+        btn.disabled = false;
+        btn.innerHTML = 'Dokončaj registracijo →';
+    }
 }
 
 function izberPaket(el, paket) {
@@ -387,9 +479,11 @@ function togglePassword() {
     input.type = input.type === 'password' ? 'text' : 'password';
 }
 
-function nextInput(el, idx) {
-    if(el.value && idx < 6) document.querySelectorAll('.verify-input')[idx].focus();
-}
+// Preveri če je user že prijavljen
+window.addEventListener('load', async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if(session) window.location.href = 'dashboard.html';
+});
 </script>
 </body>
 </html>
