@@ -929,7 +929,7 @@ async function shraniIskanje(num) {
     const iskanje = { id:num, url:urls[0], urls:urls, paket:PAKET, aktiven:true, ime:naslov, kat:kat };
 
     try {
-        const r = await fetch('http://localhost:5000/iskanja', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(iskanje)});
+        const r = await fetch('https://clever-beauty-production-3d95.up.railway.app/iskanja', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(iskanje)});
         if(r.ok) {
             statusEl.className = 'scraper-status ok';
             statusEl.innerHTML = '<div class="scraper-dot pulse"></div><span>✅ Shranjeno na strežnik · Scraper aktiviran</span>';

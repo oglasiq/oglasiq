@@ -28,19 +28,18 @@ def get_iskanja():
 def post_iskanje():
     data = request.json
     iskanja = nalozi_iskanja()
-    
-    # Poisci ali ze obstaja
+
     obstaja = False
     for i, isk in enumerate(iskanja):
         if isk.get("id") == data.get("id"):
             iskanja[i] = data
             obstaja = True
             break
-    
+
     if not obstaja:
         data["id"] = len(iskanja) + 1
         iskanja.append(data)
-    
+
     shrani_iskanja(iskanja)
     return jsonify({"status": "ok", "iskanje": data})
 
@@ -63,7 +62,12 @@ def toggle_iskanje(iid):
     shrani_iskanja(iskanja)
     return jsonify({"status": "ok"})
 
+# Health check za Railway
+@app.route("/", methods=["GET"])
+def health():
+    return jsonify({"status": "ok", "service": "OglasIQ API"})
+
 if __name__ == "__main__":
-    print("🚀 OglasIQ strežnik se zaganja...")
-    print("📡 Strežnik teče na http://localhost:5000")
-    app.run(debug=False, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"🚀 OglasIQ strežnik se zaganja na portu {port}...")
+    app.run(debug=False, host="0.0.0.0", port=port)
