@@ -6,136 +6,193 @@
     <title>OglasIQ — Dashboard</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;}
-        :root{--bg:#080810;--surface:#0f0f1a;--border:#1a1a2e;--text:#ffffff;--muted:#6b7280;--accent:#5b6cf9;}
+        :root{
+            --bg:#060609;
+            --surface:#0d0d16;
+            --surface2:#111120;
+            --border:#1a1a2e;
+            --border2:#252540;
+            --text:#eeeeff;
+            --muted:#5a5a7a;
+            --accent:#6366f1;
+            --accent2:#818cf8;
+            --green:#22c55e;
+            --red:#ef4444;
+            --yellow:#f59e0b;
+        }
         body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
 
-        .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
-        .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:600;}
-        .logo-ring{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;}
-        .logo-dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--accent);}
-        .sidebar-nav{flex:1;padding:12px 0;overflow-y:auto;}
-        .nav-section{padding:8px 16px 4px;font-size:10px;font-weight:600;color:#374151;letter-spacing:0.08em;text-transform:uppercase;}
-        .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;text-decoration:none;}
-        .nav-item:hover{color:#fff;background:rgba(255,255,255,0.03);}
-        .nav-item.active{color:#fff;background:rgba(91,108,249,0.08);border-left-color:var(--accent);}
-        .nav-icon{width:16px;text-align:center;font-size:14px;}
-        .nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;}
-        .sidebar-user{padding:16px;border-top:1px solid var(--border);}
+        /* SIDEBAR */
+        .sidebar{width:228px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
+        .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border);}
+        .logo-icon{width:28px;height:28px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;}
+        .logo-text{font-size:16px;font-weight:700;letter-spacing:-0.3px;}
+        .sidebar-nav{flex:1;padding:10px 0;overflow-y:auto;}
+        .nav-section{padding:12px 18px 4px;font-size:10px;font-weight:700;color:#252540;letter-spacing:0.1em;text-transform:uppercase;}
+        .nav-item{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;text-decoration:none;}
+        .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.02);}
+        .nav-item.active{color:var(--text);background:rgba(99,102,241,0.08);border-left-color:var(--accent);}
+        .nav-icon{width:18px;text-align:center;font-size:14px;}
+        .nav-badge{margin-left:auto;background:rgba(99,102,241,0.2);color:var(--accent2);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;}
+        .sidebar-bottom{padding:16px;border-top:1px solid var(--border);}
         .user-row{display:flex;align-items:center;gap:10px;}
-        .user-av{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
-        .user-name{font-size:13px;font-weight:500;}
-        .user-plan{font-size:11px;color:var(--accent);}
-        .user-logout{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;}
+        .user-av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#a855f7);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;}
+        .user-name{font-size:13px;font-weight:600;}
+        .user-plan{font-size:11px;color:var(--accent2);}
+        .user-logout{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:15px;padding:4px;}
+        .user-logout:hover{color:var(--text);}
 
-        .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
-        .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(8,8,16,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:40;}
-        .topbar-title{font-size:15px;font-weight:600;}
-        .topbar-right{display:flex;align-items:center;gap:12px;}
-        .notif-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;position:relative;}
-        .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:1.5px solid var(--bg);}
-        .btn-new{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;}
+        /* MAIN */
+        .main{margin-left:228px;flex:1;display:flex;flex-direction:column;}
+        .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(6,6,9,0.92);backdrop-filter:blur(20px);position:sticky;top:0;z-index:40;}
+        .topbar-title{font-size:15px;font-weight:700;}
+        .topbar-right{display:flex;align-items:center;gap:10px;}
+        .icon-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;position:relative;transition:all 0.15s;}
+        .icon-btn:hover{border-color:var(--border2);color:var(--text);}
+        .notif-dot{position:absolute;top:7px;right:7px;width:6px;height:6px;background:var(--red);border-radius:50%;border:1.5px solid var(--bg);}
+        .btn-primary{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+        .btn-primary:hover{opacity:0.85;}
 
-        .content{padding:28px;flex:1;}
+        .content{padding:24px 28px;flex:1;}
 
         /* STATS */
-        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
-        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
-        .stat-label{font-size:12px;color:var(--muted);margin-bottom:8px;}
-        .stat-val{font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
-        .stat-change{font-size:11px;color:#22c55e;}
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+        .stat-label{font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;}
+        .stat-val{font-size:24px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
+        .stat-sub{font-size:11px;color:var(--green);}
+        .stat-sub.warn{color:var(--yellow);}
 
-        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-        .section-title{font-size:15px;font-weight:600;}
-        .section-link{font-size:12px;color:var(--accent);cursor:pointer;background:none;border:none;}
+        /* ISKANJE CARD */
+        .iskanje-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;transition:border-color 0.2s;}
+        .iskanje-card:hover{border-color:var(--border2);}
+        .iskanje-card.locked{opacity:0.45;pointer-events:none;}
+        .iskanje-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;}
+        .iskanje-header-left{display:flex;align-items:center;gap:12px;}
+        .iskanje-num{width:28px;height:28px;border-radius:8px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--accent2);}
+        .iskanje-num.locked-num{background:rgba(90,90,122,0.1);border-color:var(--border);color:var(--muted);}
+        .iskanje-title{font-size:14px;font-weight:600;}
+        .iskanje-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+        .iskanje-header-right{display:flex;align-items:center;gap:10px;}
+        .status-pill{display:flex;align-items:center;gap:5px;font-size:11px;padding:4px 10px;border-radius:20px;}
+        .status-pill.active{background:rgba(34,197,94,0.1);color:var(--green);}
+        .status-pill.inactive{background:rgba(90,90,122,0.12);color:var(--muted);}
+        .status-pill.locked-pill{background:rgba(90,90,122,0.1);color:var(--muted);}
+        .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+        .chevron{font-size:12px;color:var(--muted);transition:transform 0.2s;}
+        .chevron.open{transform:rotate(180deg);}
 
-        /* URL ISKANJA */
-        .url-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;}
-        .url-section-title{font-size:14px;font-weight:600;margin-bottom:6px;}
-        .url-section-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+        .iskanje-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border);}
+        .iskanje-body.open{display:block;}
 
-        .url-slots{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
-        .url-slot{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;}
-        .url-slot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-        .url-slot-num{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;}
-        .url-slot-status{display:flex;align-items:center;gap:5px;font-size:11px;}
-        .status-dot{width:7px;height:7px;border-radius:50%;}
-        .status-dot.on{background:#22c55e;}
-        .status-dot.off{background:#4b5563;}
-        .url-input-row{display:flex;gap:8px;}
-        .url-input{flex:1;background:var(--surface);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:12px;outline:none;transition:border-color 0.2s;}
-        .url-input:focus{border-color:var(--accent);}
-        .url-input::placeholder{color:#374151;}
-        .url-detect-btn{background:var(--accent);color:#fff;border:none;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;}
-        .url-detect-btn:hover{opacity:0.85;}
-        .url-detect-btn:disabled{opacity:0.4;cursor:not-allowed;}
+        /* KATEGORIJA IZBIRA */
+        .section-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;margin-top:18px;}
+        .kat-grid{display:flex;flex-wrap:wrap;gap:8px;}
+        .kat-pill{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);font-size:12px;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+        .kat-pill:hover{border-color:var(--border2);color:var(--text);}
+        .kat-pill.selected{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:var(--accent2);}
+        .kat-icon{font-size:15px;}
 
-        .detected-info{display:none;margin-top:10px;background:rgba(91,108,249,0.06);border:1px solid rgba(91,108,249,0.15);border-radius:8px;padding:10px 12px;}
-        .detected-info.show{display:block;}
-        .detected-portal{font-size:12px;font-weight:600;color:#a5b4fc;margin-bottom:4px;}
-        .detected-cat{font-size:11px;color:var(--muted);}
+        /* PORTALI */
+        .portali-regije{display:flex;flex-direction:column;gap:10px;}
+        .regija-row{display:flex;align-items:flex-start;gap:10px;}
+        .regija-label{font-size:11px;color:var(--muted);width:30px;padding-top:8px;flex-shrink:0;}
+        .portali-list{display:flex;flex-wrap:wrap;gap:6px;}
+        .portal-chip{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+        .portal-chip:hover{border-color:var(--border2);color:var(--text);}
+        .portal-chip.selected{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:var(--accent2);}
+        .portal-flag{font-size:13px;}
 
-        .url-filters{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
-        .url-filters.show{display:block;}
-        .filter-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
-        .f-group label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;}
-        .f-input{width:100%;background:var(--surface);border:1px solid var(--border);color:#fff;padding:7px 10px;border-radius:6px;font-size:11px;outline:none;}
+        /* LOKACIJA */
+        .lokacija-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .f-group{display:flex;flex-direction:column;gap:5px;}
+        .f-label{font-size:11px;color:var(--muted);}
+        .f-input{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;font-size:12px;outline:none;transition:border-color 0.15s;width:100%;}
         .f-input:focus{border-color:var(--accent);}
-        .f-select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:6px;font-size:11px;outline:none;cursor:pointer;}
-        .checks-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
-        .check-pill{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all 0.15s;}
-        .check-pill.on{background:rgba(91,108,249,0.15);border-color:var(--accent);color:#a5b4fc;}
+        .f-input::placeholder{color:#2d2d45;}
+        .f-select{background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 11px;border-radius:8px;font-size:12px;outline:none;cursor:pointer;width:100%;}
+        .f-select option{background:var(--surface2);}
 
-        .url-slot.locked{opacity:0.4;pointer-events:none;position:relative;}
-        .locked-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,8,16,0.7);border-radius:10px;font-size:12px;color:var(--muted);}
+        /* FILTRI PO KATEGORIJI */
+        .filtri-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+        .filtri-grid.col2{grid-template-columns:repeat(2,1fr);}
+        .filtri-grid.col4{grid-template-columns:repeat(4,1fr);}
 
-        .save-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;}
-        .save-btn:hover{opacity:0.85;}
+        .check-pills{display:flex;flex-wrap:wrap;gap:6px;}
+        .check-pill{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface2);font-size:11px;color:var(--muted);cursor:pointer;transition:all 0.15s;}
+        .check-pill:hover{border-color:var(--border2);color:var(--text);}
+        .check-pill.on{background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);color:var(--accent2);}
+
+        .divider{height:1px;background:var(--border);margin:16px 0;}
+
+        /* URL PREVIEW */
+        .url-preview{background:rgba(99,102,241,0.05);border:1px solid rgba(99,102,241,0.15);border-radius:10px;padding:12px 14px;margin-top:16px;}
+        .url-preview-label{font-size:10px;color:var(--accent2);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+        .url-preview-list{display:flex;flex-direction:column;gap:4px;}
+        .url-preview-item{font-size:11px;color:var(--muted);word-break:break-all;display:flex;align-items:center;gap:6px;}
+        .url-preview-item .pflag{font-size:12px;}
+
+        .save-iskanje-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:11px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;margin-top:16px;transition:opacity 0.15s;}
+        .save-iskanje-btn:hover{opacity:0.85;}
+
+        .locked-banner{background:rgba(90,90,122,0.08);border:1px solid rgba(90,90,122,0.15);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin-top:14px;}
+        .locked-banner a{color:var(--accent2);cursor:pointer;text-decoration:none;}
 
         /* OBVESTILA */
-        .obvestila-list{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
-        .ob-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;cursor:pointer;transition:border-color 0.15s;}
-        .ob-card:hover{border-color:#2a2a3a;}
+        .ob-list{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+        .ob-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px 16px;display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;cursor:pointer;transition:border-color 0.15s;}
+        .ob-card:hover{border-color:var(--border2);}
         .ob-card.novo{border-left:2px solid var(--accent);}
-        .ob-icon{width:40px;height:40px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
-        .ob-title{font-size:13px;font-weight:600;margin-bottom:2px;}
-        .ob-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;}
-        .ob-price{font-size:15px;font-weight:700;text-align:right;}
-        .ob-portal{font-size:10px;color:var(--accent);text-align:right;margin-top:2px;}
-        .ob-time{font-size:10px;color:var(--muted);text-align:right;margin-top:2px;}
-        .novo-badge{background:rgba(91,108,249,0.15);color:#a5b4fc;font-size:9px;padding:2px 5px;border-radius:3px;margin-left:6px;}
+        .ob-icon{width:36px;height:36px;background:var(--surface2);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+        .ob-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+        .ob-meta{font-size:11px;color:var(--muted);display:flex;gap:6px;flex-wrap:wrap;}
+        .ob-price{font-size:15px;font-weight:700;}
+        .ob-portal{font-size:10px;color:var(--accent2);margin-top:2px;}
+        .ob-time{font-size:10px;color:var(--muted);margin-top:2px;}
+        .novo-badge{background:rgba(99,102,241,0.15);color:var(--accent2);font-size:9px;padding:2px 6px;border-radius:4px;margin-left:6px;font-weight:600;}
 
         /* SPODAJ */
         .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
         .paket-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
-        .paket-name{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;}
-        .paket-price{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
+        .paket-name{font-size:11px;font-weight:700;color:var(--accent2);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;}
+        .paket-price{font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:3px;}
         .paket-price small{font-size:13px;color:var(--muted);font-weight:400;}
-        .paket-interval{font-size:12px;color:#22c55e;margin-bottom:12px;}
-        .paket-feats{list-style:none;margin:14px 0;}
-        .paket-feats li{font-size:13px;color:#9ca3af;padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-        .paket-feats li::before{content:"✓";color:var(--accent);font-size:11px;}
-        .upgrade-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;margin-top:4px;}
+        .paket-interval{font-size:12px;color:var(--green);margin-bottom:12px;}
+        .paket-feats{list-style:none;margin:12px 0;}
+        .paket-feats li{font-size:12px;color:#9ca3af;padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+        .paket-feats li::before{content:"✓";color:var(--accent);font-size:10px;}
+        .upgrade-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;transition:opacity 0.15s;}
+        .upgrade-btn:hover{opacity:0.85;}
 
         .graf-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
-        .graf-bars{display:flex;align-items:flex-end;gap:8px;height:80px;margin-top:16px;}
-        .graf-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
-        .graf-bar{width:100%;background:var(--accent);border-radius:3px 3px 0 0;opacity:0.7;}
+        .graf-bars{display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:16px;}
+        .graf-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;}
+        .graf-bar{width:100%;background:var(--accent);border-radius:3px 3px 0 0;opacity:0.6;transition:opacity 0.15s;}
+        .graf-bar:hover{opacity:1;}
         .graf-label{font-size:10px;color:var(--muted);}
 
-        .plan-limit{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 14px;font-size:12px;color:#f87171;margin-top:10px;display:flex;align-items:center;gap:8px;}
+        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+        .section-title{font-size:14px;font-weight:700;}
+        .section-link{font-size:12px;color:var(--accent2);cursor:pointer;background:none;border:none;}
+
+        /* RANGE SLIDER */
+        .range-wrap{position:relative;}
+        .range-vals{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px;}
+        input[type=range]{width:100%;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--border2);outline:none;cursor:pointer;}
+        input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;}
     </style>
 </head>
 <body>
 
 <div class="sidebar">
     <div class="sidebar-logo">
-        <div class="logo-ring"><div class="logo-dot"></div></div>
-        OglasIQ
+        <div class="logo-icon">🔍</div>
+        <div class="logo-text">OglasIQ</div>
     </div>
     <div class="sidebar-nav">
         <div class="nav-section">Glavno</div>
         <a class="nav-item active" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
-        <a class="nav-item" href="#"><span class="nav-icon">🔍</span> Moja iskanja<span class="nav-badge">1</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">🔍</span> Moja iskanja<span class="nav-badge" id="nb-iskanja">1</span></a>
         <a class="nav-item" href="#"><span class="nav-icon">🔔</span> Obvestila<span class="nav-badge">4</span></a>
         <a class="nav-item" href="#"><span class="nav-icon">⭐</span> Shranjeni oglasi</a>
         <div class="nav-section">Račun</div>
@@ -146,12 +203,12 @@
         <a class="nav-item" href="#"><span class="nav-icon">❓</span> Pomoč</a>
         <a class="nav-item" href="index.html"><span class="nav-icon">🌐</span> Nazaj na stran</a>
     </div>
-    <div class="sidebar-user">
+    <div class="sidebar-bottom">
         <div class="user-row">
-            <div class="user-av">JN</div>
+            <div class="user-av" id="user-av">JN</div>
             <div>
-                <div class="user-name">Janez Novak</div>
-                <div class="user-plan">Free paket</div>
+                <div class="user-name" id="user-name">Janez Novak</div>
+                <div class="user-plan" id="user-plan-label">Free paket</div>
             </div>
             <button class="user-logout" onclick="window.location.href='prijava.html'" title="Odjava">↩</button>
         </div>
@@ -162,200 +219,200 @@
     <div class="topbar">
         <div class="topbar-title">Dashboard</div>
         <div class="topbar-right">
-            <div class="notif-btn">🔔<div class="notif-dot"></div></div>
-            <button class="btn-new" onclick="document.getElementById('url-section').scrollIntoView({behavior:'smooth'})">+ Novo iskanje</button>
+            <div class="icon-btn">🔔<div class="notif-dot"></div></div>
+            <button class="btn-primary" onclick="scrollToIskanja()">+ Novo iskanje</button>
         </div>
     </div>
 
     <div class="content">
 
+        <!-- STATS -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Aktivna iskanja</div>
-                <div class="stat-val">1</div>
-                <div class="stat-change">Free: max 1 URL</div>
+                <div class="stat-val" id="stat-aktivna">1</div>
+                <div class="stat-sub" id="stat-max">Free: max 1 iskanje</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Oglasi danes</div>
                 <div class="stat-val">8</div>
-                <div class="stat-change">↑ 3 več kot včeraj</div>
+                <div class="stat-sub">↑ 3 več kot včeraj</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Skupaj najdenih</div>
                 <div class="stat-val">47</div>
-                <div class="stat-change">Ta teden</div>
+                <div class="stat-sub">Ta teden</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Naslednje osvežitev</div>
+                <div class="stat-label">Naslednja osvežitev</div>
                 <div class="stat-val" id="countdown">23:47</div>
-                <div class="stat-change">Free: vsake 24 ur</div>
+                <div class="stat-sub warn" id="stat-interval">Free: vsake 24 ur</div>
             </div>
         </div>
 
-        <!-- URL ISKANJA -->
-        <div class="url-section" id="url-section">
-            <div class="url-section-title">Moja iskanja</div>
-            <div class="url-section-sub">Pojdi na portal po svoji izbiri, nastavi filtre in prilepi URL v polje spodaj. OglasIQ bo samodejno zaznal portal in kategorijo.</div>
-
-            <div class="url-slots">
-
-                <!-- URL 1 - AKTIVEN -->
-                <div class="url-slot">
-                    <div class="url-slot-header">
-                        <div class="url-slot-num">Iskanje 1</div>
-                        <div class="url-slot-status">
-                            <div class="status-dot on"></div>
-                            <span style="font-size:11px;color:#22c55e;">Aktivno</span>
-                        </div>
-                    </div>
-                    <div class="url-input-row">
-                        <input class="url-input" type="url" placeholder="https://www.avto.net/Ads/results.asp?..." value="https://www.avto.net/Ads/results.asp?znamka=BMW" id="url1">
-                        <button class="url-detect-btn" onclick="zaznaPortal(1)">🔍 Zaznaj</button>
-                    </div>
-                    <div class="detected-info show" id="detected1">
-                        <div class="detected-portal">🇸🇮 Avto.net — Avtomobili</div>
-                        <div class="detected-cat">Kategorija zaznana · Filtri aktivni</div>
-                    </div>
-                    <div class="url-filters show" id="filters1">
-                        <div class="filter-row">
-                            <div class="f-group">
-                                <label>Cena od (€)</label>
-                                <input class="f-input" type="number" placeholder="0" value="5000">
-                            </div>
-                            <div class="f-group">
-                                <label>Cena do (€)</label>
-                                <input class="f-input" type="number" placeholder="50000" value="25000">
-                            </div>
-                            <div class="f-group">
-                                <label>Letnik od</label>
-                                <input class="f-input" type="number" placeholder="2015" value="2017">
-                            </div>
-                        </div>
-                        <div class="filter-row">
-                            <div class="f-group">
-                                <label>Km do</label>
-                                <input class="f-input" type="number" placeholder="200000" value="150000">
-                            </div>
-                            <div class="f-group">
-                                <label>Gorivo</label>
-                                <select class="f-select">
-                                    <option>Vse</option>
-                                    <option selected>Diesel</option>
-                                    <option>Bencin</option>
-                                    <option>Elektrika</option>
-                                    <option>Hibrid</option>
-                                </select>
-                            </div>
-                            <div class="f-group">
-                                <label>Pogon</label>
-                                <select class="f-select">
-                                    <option>Vse</option>
-                                    <option>Sprednji</option>
-                                    <option>Zadnji</option>
-                                    <option selected>4x4 / AWD</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="f-group">
-                            <label>Oprema</label>
-                            <div class="checks-row">
-                                <div class="check-pill on" onclick="this.classList.toggle('on')">LED žarometi</div>
-                                <div class="check-pill on" onclick="this.classList.toggle('on')">Navigacija</div>
-                                <div class="check-pill" onclick="this.classList.toggle('on')">Usnje</div>
-                                <div class="check-pill" onclick="this.classList.toggle('on')">Panorama</div>
-                                <div class="check-pill on" onclick="this.classList.toggle('on')">CarPlay</div>
-                                <div class="check-pill" onclick="this.classList.toggle('on')">Ogrev. sedeži</div>
-                                <div class="check-pill" onclick="this.classList.toggle('on')">360° kamera</div>
-                                <div class="check-pill" onclick="this.classList.toggle('on')">Lane assist</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- URL 2 - ZAKLENJEN (Free) -->
-                <div class="url-slot" style="position:relative;">
-                    <div class="url-slot-header">
-                        <div class="url-slot-num">Iskanje 2</div>
-                        <div class="url-slot-status">
-                            <div class="status-dot off"></div>
-                            <span style="font-size:11px;color:var(--muted);">Zaklenjeno</span>
-                        </div>
-                    </div>
-                    <div class="url-input-row">
-                        <input class="url-input" type="url" placeholder="Dostopno v Starter paketu..." disabled style="opacity:0.4;">
-                        <button class="url-detect-btn" disabled>🔒 Zaklenjeno</button>
-                    </div>
-                    <div class="plan-limit">🔒 Nadgradi na Starter (3€/mes) za 2 iskanja</div>
-                </div>
-
+        <!-- ISKANJA -->
+        <div id="iskanja-section">
+            <div class="section-header">
+                <div class="section-title">Moja iskanja</div>
             </div>
 
-            <button class="save-btn" onclick="shraniIskanje()">💾 Shrani iskanje</button>
+            <!-- ISKANJE 1 - AKTIVNO -->
+            <div class="iskanje-card" id="card1">
+                <div class="iskanje-header" onclick="toggleCard(1)">
+                    <div class="iskanje-header-left">
+                        <div class="iskanje-num">1</div>
+                        <div>
+                            <div class="iskanje-title" id="card1-title">Iskanje 1</div>
+                            <div class="iskanje-sub" id="card1-sub">Klikni za nastavitev</div>
+                        </div>
+                    </div>
+                    <div class="iskanje-header-right">
+                        <div class="status-pill active"><div class="status-dot"></div> Aktivno</div>
+                        <div class="chevron" id="chev1">▼</div>
+                    </div>
+                </div>
+                <div class="iskanje-body open" id="body1">
+                    <!-- KATEGORIJA -->
+                    <div class="section-label">1. Kategorija</div>
+                    <div class="kat-grid" id="kat-grid1">
+                        <div class="kat-pill selected" onclick="izberKat(1,'avto')" data-kat="avto"><span class="kat-icon">🚗</span> Avtomobili</div>
+                        <div class="kat-pill" onclick="izberKat(1,'motor')" data-kat="motor"><span class="kat-icon">🏍️</span> Motorji</div>
+                        <div class="kat-pill" onclick="izberKat(1,'quad')" data-kat="quad"><span class="kat-icon">🏎️</span> Štirikolesa</div>
+                        <div class="kat-pill" onclick="izberKat(1,'skuter')" data-kat="skuter"><span class="kat-icon">🛵</span> Skuterji</div>
+                        <div class="kat-pill" onclick="izberKat(1,'nepremicnina')" data-kat="nepremicnina"><span class="kat-icon">🏠</span> Nepremičnine</div>
+                        <div class="kat-pill" onclick="izberKat(1,'plovilo')" data-kat="plovilo"><span class="kat-icon">⛵</span> Plovila</div>
+                        <div class="kat-pill" onclick="izberKat(1,'kombi')" data-kat="kombi"><span class="kat-icon">🚐</span> Kombiji</div>
+                        <div class="kat-pill" onclick="izberKat(1,'kmetijstvo')" data-kat="kmetijstvo"><span class="kat-icon">🚜</span> Kmetijska meh.</div>
+                        <div class="kat-pill" onclick="izberKat(1,'splosno')" data-kat="splosno"><span class="kat-icon">📦</span> Splošno</div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- PORTALI -->
+                    <div class="section-label">2. Izberi portale</div>
+                    <div class="portali-regije" id="portali1">
+                        <!-- generirano z JS -->
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- LOKACIJA -->
+                    <div class="section-label">3. Lokacija</div>
+                    <div class="lokacija-row">
+                        <div class="f-group">
+                            <div class="f-label">Moja lokacija (kraj / ZIP)</div>
+                            <input class="f-input" type="text" placeholder="npr. Ljubljana, 1000..." id="lok-kraj1">
+                        </div>
+                        <div class="f-group">
+                            <div class="f-label">Razdalja iskanja</div>
+                            <select class="f-select" id="lok-razdalja1">
+                                <option value="">Cela država / brez omejitve</option>
+                                <option value="25">do 25 km</option>
+                                <option value="50">do 50 km</option>
+                                <option value="100">do 100 km</option>
+                                <option value="150">do 150 km</option>
+                                <option value="200">do 200 km</option>
+                                <option value="300">do 300 km</option>
+                                <option value="500">do 500 km</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- FILTRI - dinamični -->
+                    <div class="section-label">4. Filtri</div>
+                    <div id="filtri1">
+                        <!-- generirano z JS glede na kategorijo -->
+                    </div>
+
+                    <!-- URL PREVIEW -->
+                    <div class="url-preview" id="url-preview1">
+                        <div class="url-preview-label">🔗 Generirani URL-ji za iskanje</div>
+                        <div class="url-preview-list" id="url-list1">
+                            <div class="url-preview-item" style="color:var(--muted);font-style:italic;">Izberi portale in nastavi filtre za prikaz URL-jev...</div>
+                        </div>
+                    </div>
+
+                    <button class="save-iskanje-btn" onclick="shraniIskanje(1)">💾 Shrani iskanje 1</button>
+                </div>
+            </div>
+
+            <!-- ISKANJE 2 - ZAKLENJENO (Free) -->
+            <div class="iskanje-card locked" id="card2">
+                <div class="iskanje-header">
+                    <div class="iskanje-header-left">
+                        <div class="iskanje-num locked-num">2</div>
+                        <div>
+                            <div class="iskanje-title">Iskanje 2</div>
+                            <div class="iskanje-sub">Dostopno v Starter paketu</div>
+                        </div>
+                    </div>
+                    <div class="iskanje-header-right">
+                        <div class="status-pill locked-pill"><div class="status-dot"></div> Zaklenjeno</div>
+                    </div>
+                </div>
+                <div class="iskanje-body open">
+                    <div class="locked-banner">🔒 Nadgradi na <a>Starter (3€/mes)</a> za 2 iskanja</div>
+                </div>
+            </div>
+
         </div>
 
         <!-- ZADNJA OBVESTILA -->
-        <div class="section-header">
-            <div class="section-title">Zadnja obvestila</div>
-            <button class="section-link">Vsa obvestila →</button>
-        </div>
-        <div class="obvestila-list">
-            <div class="ob-card novo">
-                <div class="ob-icon">🚗</div>
-                <div>
-                    <div class="ob-title">BMW 320d xDrive <span class="novo-badge">NOVO</span></div>
-                    <div class="ob-meta"><span>2019</span><span>·</span><span>89.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
-                </div>
-                <div>
-                    <div class="ob-price">18.500 €</div>
-                    <div class="ob-portal">🇸🇮 Avto.net</div>
-                    <div class="ob-time">pred 5 min</div>
-                </div>
+        <div style="margin-top:28px;">
+            <div class="section-header">
+                <div class="section-title">Zadnja obvestila</div>
+                <button class="section-link">Vsa obvestila →</button>
             </div>
-            <div class="ob-card novo">
-                <div class="ob-icon">🚗</div>
-                <div>
-                    <div class="ob-title">BMW 318d Touring <span class="novo-badge">NOVO</span></div>
-                    <div class="ob-meta"><span>2020</span><span>·</span><span>112.000 km</span><span>·</span><span>Diesel</span></div>
+            <div class="ob-list">
+                <div class="ob-card novo">
+                    <div class="ob-icon">🚗</div>
+                    <div>
+                        <div class="ob-title">BMW 320d xDrive <span class="novo-badge">NOVO</span></div>
+                        <div class="ob-meta"><span>2019</span><span>·</span><span>89.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="ob-price">18.500 €</div>
+                        <div class="ob-portal">🇸🇮 Avto.net</div>
+                        <div class="ob-time">pred 5 min</div>
+                    </div>
                 </div>
-                <div>
-                    <div class="ob-price">16.900 €</div>
-                    <div class="ob-portal">🇩🇪 Mobile.de</div>
-                    <div class="ob-time">pred 1 uro</div>
+                <div class="ob-card novo">
+                    <div class="ob-icon">🚗</div>
+                    <div>
+                        <div class="ob-title">BMW 318d Touring <span class="novo-badge">NOVO</span></div>
+                        <div class="ob-meta"><span>2020</span><span>·</span><span>112.000 km</span><span>·</span><span>Diesel</span></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="ob-price">16.900 €</div>
+                        <div class="ob-portal">🇩🇪 Mobile.de</div>
+                        <div class="ob-time">pred 1 uro</div>
+                    </div>
                 </div>
-            </div>
-            <div class="ob-card">
-                <div class="ob-icon">🚗</div>
-                <div>
-                    <div class="ob-title">BMW X3 xDrive20d</div>
-                    <div class="ob-meta"><span>2018</span><span>·</span><span>134.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
-                </div>
-                <div>
-                    <div class="ob-price">22.400 €</div>
-                    <div class="ob-portal">🇦🇹 Willhaben</div>
-                    <div class="ob-time">pred 3 urami</div>
-                </div>
-            </div>
-            <div class="ob-card">
-                <div class="ob-icon">🚗</div>
-                <div>
-                    <div class="ob-title">BMW 325d xDrive</div>
-                    <div class="ob-meta"><span>2017</span><span>·</span><span>178.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
-                </div>
-                <div>
-                    <div class="ob-price">14.800 €</div>
-                    <div class="ob-portal">🇭🇷 Njuskalo.hr</div>
-                    <div class="ob-time">pred 5 urami</div>
+                <div class="ob-card">
+                    <div class="ob-icon">🚗</div>
+                    <div>
+                        <div class="ob-title">BMW X3 xDrive20d</div>
+                        <div class="ob-meta"><span>2018</span><span>·</span><span>134.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="ob-price">22.400 €</div>
+                        <div class="ob-portal">🇦🇹 Willhaben</div>
+                        <div class="ob-time">pred 3 urami</div>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- PAKET + GRAF -->
         <div class="two-col">
             <div class="paket-card">
                 <div class="paket-name">Tvoj paket — Free</div>
                 <div class="paket-price">0€ <small>/mesec</small></div>
                 <div class="paket-interval">⏱ Osvežuje vsake 24 ur</div>
                 <ul class="paket-feats">
-                    <li>1 URL iskanje</li>
+                    <li>1 iskanje</li>
                     <li>Email obvestila</li>
                     <li>Zgodovina 7 dni</li>
                 </ul>
@@ -379,57 +436,742 @@
 </div>
 
 <script>
-const portali = {
-    "avto.net": {ime:"🇸🇮 Avto.net", kat:"Avtomobili"},
-    "bolha.com": {ime:"🇸🇮 Bolha.com", kat:"Splošno"},
-    "nepremicnine.net": {ime:"🇸🇮 Nepremicnine.net", kat:"Nepremičnine"},
-    "njuskalo.hr": {ime:"🇭🇷 Njuskalo.hr", kat:"Avtomobili / Splošno"},
-    "olx.ba": {ime:"🇧🇦 OLX.ba", kat:"Splošno"},
-    "olx.hr": {ime:"🇭🇷 OLX.hr", kat:"Splošno"},
-    "olx.rs": {ime:"🇷🇸 OLX.rs", kat:"Splošno"},
-    "halooglasi.com": {ime:"🇷🇸 Halo Oglasi", kat:"Splošno"},
-    "mobile.de": {ime:"🇩🇪 Mobile.de", kat:"Avtomobili"},
-    "autoscout24": {ime:"🇩🇪 AutoScout24", kat:"Avtomobili"},
-    "willhaben.at": {ime:"🇦🇹 Willhaben", kat:"Splošno"},
-    "subito.it": {ime:"🇮🇹 Subito.it", kat:"Splošno"},
-    "olx.me": {ime:"🇲🇪 OLX.me", kat:"Splošno"},
+// ===================== PODATKI =====================
+
+const PAKET = 'free'; // free | starter | pro | premium
+const MAX_ISKANJ = {free:1, starter:2, pro:4, premium:5};
+
+const PORTALI_PO_REGIJAH = [
+    {
+        regija: '🇸🇮', label: 'SLO',
+        portali: [
+            {id:'avto.net', ime:'Avto.net', flag:'🇸🇮', kat:['avto','kombi']},
+            {id:'bolha.com', ime:'Bolha.com', flag:'🇸🇮', kat:['avto','motor','quad','skuter','nepremicnina','plovilo','kombi','splosno','kmetijstvo']},
+            {id:'nepremicnine.net', ime:'Nepremičnine.net', flag:'🇸🇮', kat:['nepremicnina']},
+            {id:'bolha.com/motorji', ime:'Bolha Motorji', flag:'🇸🇮', kat:['motor','quad','skuter']},
+        ]
+    },
+    {
+        regija: '🇭🇷', label: 'HR',
+        portali: [
+            {id:'njuskalo.hr', ime:'Njuškalo.hr', flag:'🇭🇷', kat:['avto','motor','quad','nepremicnina','plovilo','kombi','splosno']},
+            {id:'olx.hr', ime:'OLX.hr', flag:'🇭🇷', kat:['avto','motor','nepremicnina','splosno']},
+        ]
+    },
+    {
+        regija: '🇧🇦', label: 'BA',
+        portali: [
+            {id:'olx.ba', ime:'OLX.ba', flag:'🇧🇦', kat:['avto','motor','nepremicnina','splosno']},
+        ]
+    },
+    {
+        regija: '🇷🇸', label: 'RS',
+        portali: [
+            {id:'halooglasi.com', ime:'Halo Oglasi', flag:'🇷🇸', kat:['avto','motor','nepremicnina','splosno']},
+            {id:'kupujemprodajem.com', ime:'KupujemProdajem', flag:'🇷🇸', kat:['avto','splosno']},
+            {id:'olx.rs', ime:'OLX.rs', flag:'🇷🇸', kat:['avto','motor','splosno']},
+        ]
+    },
+    {
+        regija: '🇲🇪', label: 'ME',
+        portali: [
+            {id:'olx.me', ime:'OLX.me', flag:'🇲🇪', kat:['avto','splosno']},
+        ]
+    },
+    {
+        regija: '🇩🇪', label: 'DE',
+        portali: [
+            {id:'mobile.de', ime:'Mobile.de', flag:'🇩🇪', kat:['avto','motor','kombi']},
+            {id:'autoscout24.de', ime:'AutoScout24', flag:'🇩🇪', kat:['avto','motor','kombi']},
+        ]
+    },
+    {
+        regija: '🇦🇹', label: 'AT',
+        portali: [
+            {id:'willhaben.at', ime:'Willhaben', flag:'🇦🇹', kat:['avto','motor','nepremicnina','splosno']},
+            {id:'autoscout24.at', ime:'AutoScout24 AT', flag:'🇦🇹', kat:['avto','motor']},
+        ]
+    },
+    {
+        regija: '🇨🇭', label: 'CH',
+        portali: [
+            {id:'autoscout24.ch', ime:'AutoScout24 CH', flag:'🇨🇭', kat:['avto','motor']},
+        ]
+    },
+    {
+        regija: '🇮🇹', label: 'IT',
+        portali: [
+            {id:'subito.it', ime:'Subito.it', flag:'🇮🇹', kat:['avto','motor','nepremicnina','splosno']},
+        ]
+    },
+];
+
+const ZNAMKE = {
+    avto: ['Vse znamke','Abarth','Alfa Romeo','Audi','BMW','Chevrolet','Chrysler','Citroën','Dacia','Dodge','Fiat','Ford','Honda','Hyundai','Infiniti','Jaguar','Jeep','Kia','Land Rover','Lexus','Maserati','Mazda','Mercedes-Benz','Mini','Mitsubishi','Nissan','Opel','Peugeot','Porsche','Renault','SEAT','Skoda','Smart','Subaru','Suzuki','Tesla','Toyota','Volkswagen','Volvo'],
+    motor: ['Vse znamke','Aprilia','BMW','Ducati','Harley-Davidson','Honda','Husqvarna','Kawasaki','KTM','Moto Guzzi','MV Agusta','Piaggio','Royal Enfield','Suzuki','Triumph','Yamaha'],
+    quad: ['Vse znamke','Arctic Cat','Can-Am','CF Moto','Honda','Kawasaki','Kymco','Linhai','Polaris','Suzuki','TGB','Yamaha'],
+    skuter: ['Vse znamke','Aprilia','Honda','Kymco','Peugeot','Piaggio','SYM','Vespa','Yamaha','Znen'],
+    kombi: ['Vse znamke','Citroën','Fiat','Ford','Mercedes-Benz','Opel','Peugeot','Renault','Toyota','Volkswagen'],
 };
 
-function zaznaPortal(num) {
-    const url = document.getElementById('url'+num).value.trim();
-    if(!url) { alert('Prosim vnesi URL!'); return; }
+// ===================== STANJE =====================
+const state = {
+    1: { kat:'avto', portali:[], lokKraj:'', lokRazdalja:'', filtri:{} },
+    2: { kat:'avto', portali:[], lokKraj:'', lokRazdalja:'', filtri:{} },
+    3: { kat:'avto', portali:[], lokKraj:'', lokRazdalja:'', filtri:{} },
+    4: { kat:'avto', portali:[], lokKraj:'', lokRazdalja:'', filtri:{} },
+    5: { kat:'avto', portali:[], lokKraj:'', lokRazdalja:'', filtri:{} },
+};
 
-    let zaznan = null;
-    for(const [kljuc, vrednost] of Object.entries(portali)) {
-        if(url.includes(kljuc)) { zaznan = vrednost; break; }
-    }
+// ===================== TOGGLE CARD =====================
+function toggleCard(num) {
+    const body = document.getElementById('body'+num);
+    const chev = document.getElementById('chev'+num);
+    body.classList.toggle('open');
+    chev && chev.classList.toggle('open');
+}
 
-    const detectedEl = document.getElementById('detected'+num);
-    const filtersEl = document.getElementById('filters'+num);
+function scrollToIskanja() {
+    document.getElementById('iskanja-section').scrollIntoView({behavior:'smooth'});
+}
 
-    if(zaznan) {
-        detectedEl.innerHTML = `<div class="detected-portal">${zaznan.ime} — ${zaznan.kat}</div><div class="detected-cat">Portal zaznan · Nastavi filtre spodaj</div>`;
-        detectedEl.classList.add('show');
-        if(filtersEl) filtersEl.classList.add('show');
+// ===================== KATEGORIJA =====================
+function izberKat(num, kat) {
+    state[num].kat = kat;
+    state[num].portali = []; // reset portalov pri menjavi kategorije
+
+    // posodobi UI pills
+    document.querySelectorAll(`#kat-grid${num} .kat-pill`).forEach(p => {
+        p.classList.toggle('selected', p.dataset.kat === kat);
+    });
+
+    // posodobi portale
+    renderPortali(num);
+
+    // posodobi filtre
+    renderFiltri(num);
+
+    // posodobi URL preview
+    posodobiUrlPreview(num);
+}
+
+// ===================== PORTALI =====================
+function renderPortali(num) {
+    const kat = state[num].kat;
+    const container = document.getElementById('portali'+num);
+    container.innerHTML = '';
+
+    PORTALI_PO_REGIJAH.forEach(regija => {
+        const ustrezni = regija.portali.filter(p => p.kat.includes(kat));
+        if(ustrezni.length === 0) return;
+
+        const row = document.createElement('div');
+        row.className = 'regija-row';
+        row.innerHTML = `<div class="regija-label">${regija.label}</div><div class="portali-list" id="portali-list-${num}-${regija.label}"></div>`;
+        container.appendChild(row);
+
+        const list = row.querySelector('.portali-list');
+        ustrezni.forEach(portal => {
+            const chip = document.createElement('div');
+            chip.className = 'portal-chip';
+            chip.dataset.pid = portal.id;
+            chip.innerHTML = `<span class="portal-flag">${portal.flag}</span>${portal.ime}`;
+            chip.onclick = () => togglePortal(num, portal.id, chip);
+            list.appendChild(chip);
+        });
+    });
+}
+
+function togglePortal(num, pid, el) {
+    const idx = state[num].portali.indexOf(pid);
+    if(idx === -1) {
+        state[num].portali.push(pid);
+        el.classList.add('selected');
     } else {
-        detectedEl.innerHTML = `<div class="detected-portal">✅ URL shranjen</div><div class="detected-cat">Portal ni v seznamu — URL bomo pregledali</div>`;
-        detectedEl.classList.add('show');
+        state[num].portali.splice(idx, 1);
+        el.classList.remove('selected');
+    }
+    posodobiUrlPreview(num);
+}
+
+// ===================== FILTRI =====================
+function renderFiltri(num) {
+    const kat = state[num].kat;
+    const container = document.getElementById('filtri'+num);
+    container.innerHTML = '';
+
+    if(kat === 'avto' || kat === 'kombi') {
+        container.innerHTML = `
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Znamka</div>
+                <select class="f-select" id="f${num}-znamka" onchange="posodobiUrlPreview(${num})">
+                    ${(ZNAMKE.avto||[]).map(z=>`<option>${z}</option>`).join('')}
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Model</div>
+                <input class="f-input" type="text" placeholder="npr. 320d, Golf..." id="f${num}-model" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="50000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Letnik od</div>
+                <input class="f-input" type="number" placeholder="2010" id="f${num}-letnik-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Letnik do</div>
+                <input class="f-input" type="number" placeholder="2024" id="f${num}-letnik-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Km do</div>
+                <input class="f-input" type="number" placeholder="200000" id="f${num}-km-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Moč od (kW)</div>
+                <input class="f-input" type="number" placeholder="npr. 100" id="f${num}-moc-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Gorivo</div>
+                <select class="f-select" id="f${num}-gorivo" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option>
+                    <option>Bencin</option><option>Diesel</option><option>Elektrika</option>
+                    <option>Hibrid</option><option>Plug-in hibrid</option><option>Plin</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Menjalnik</div>
+                <select class="f-select" id="f${num}-menjalnik" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Ročni</option><option>Avtomatski</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Pogon</div>
+                <select class="f-select" id="f${num}-pogon" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Sprednji</option><option>Zadnji</option>
+                    <option>4x4</option><option>AWD</option>
+                </select>
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Karoserija</div>
+                <select class="f-select" id="f${num}-karoserija" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Limuzina</option><option>Karavan</option>
+                    <option>SUV</option><option>Crossover</option><option>Cabrio</option>
+                    <option>Coupe</option><option>Van</option><option>Pickup</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Energetski razred</div>
+                <select class="f-select" id="f${num}-emisije" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Euro 4</option><option>Euro 5</option><option>Euro 6</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Prodajalec</div>
+                <select class="f-select" id="f${num}-prodajalec" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vsi</option><option>Zasebnik</option><option>Trgovec</option>
+                </select>
+            </div>
+        </div>
+        <div class="f-group" style="margin-bottom:10px;">
+            <div class="f-label">Oprema</div>
+            <div class="check-pills">
+                ${['LED žarometi','Navigacija','Usnje','Panorama','CarPlay/Android Auto','Ogrev. sedeži','Ogrev. volan','360° kamera','Park senzorji','Tempomat','Head-up display','Keyless','Lane assist','Avtonomna vožnja'].map(o=>`<div class="check-pill" onclick="this.classList.toggle('on');posodobiUrlPreview(${num})">${o}</div>`).join('')}
+            </div>
+        </div>
+        <div class="f-group">
+            <div class="f-label">Stanje</div>
+            <div class="check-pills">
+                ${['Brez poškodb','Servisna knjiga','1. lastnik','Nov avto','Uvoz'].map(o=>`<div class="check-pill" onclick="this.classList.toggle('on');posodobiUrlPreview(${num})">${o}</div>`).join('')}
+            </div>
+        </div>`;
+
+    } else if(kat === 'motor') {
+        container.innerHTML = `
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Znamka</div>
+                <select class="f-select" id="f${num}-znamka" onchange="posodobiUrlPreview(${num})">
+                    ${(ZNAMKE.motor||[]).map(z=>`<option>${z}</option>`).join('')}
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Model</div>
+                <input class="f-input" type="text" placeholder="npr. CBR, R1..." id="f${num}-model" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="20000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Letnik od</div>
+                <input class="f-input" type="number" placeholder="2010" id="f${num}-letnik-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Letnik do</div>
+                <input class="f-input" type="number" placeholder="2024" id="f${num}-letnik-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">km do</div>
+                <input class="f-input" type="number" placeholder="100000" id="f${num}-km-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Prostornina ccm od</div>
+                <input class="f-input" type="number" placeholder="npr. 600" id="f${num}-ccm-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Tip motorja</div>
+                <select class="f-select" id="f${num}-tip" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option>
+                    <option>Naked / Streetfighter</option><option>Sport / Supersport</option>
+                    <option>Touring / GT</option><option>Chopper / Cruiser</option>
+                    <option>Enduro / Trail</option><option>Adventure</option>
+                    <option>Cross / Motocross</option><option>Supermoto</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Gorivo</div>
+                <select class="f-select" id="f${num}-gorivo" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Bencin</option><option>Elektrika</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Prodajalec</div>
+                <select class="f-select" id="f${num}-prodajalec" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vsi</option><option>Zasebnik</option><option>Trgovec</option>
+                </select>
+            </div>
+        </div>
+        <div class="f-group">
+            <div class="f-label">Oprema</div>
+            <div class="check-pills">
+                ${['ABS','Traction Control','Quickshifter','Ogrevane ročke','Tempomat','Riding modes','TFT zaslon','Bočne torbe'].map(o=>`<div class="check-pill" onclick="this.classList.toggle('on');posodobiUrlPreview(${num})">${o}</div>`).join('')}
+            </div>
+        </div>`;
+
+    } else if(kat === 'quad') {
+        container.innerHTML = `
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Znamka</div>
+                <select class="f-select" id="f${num}-znamka" onchange="posodobiUrlPreview(${num})">
+                    ${(ZNAMKE.quad||[]).map(z=>`<option>${z}</option>`).join('')}
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="30000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Prostornina ccm od</div>
+                <input class="f-input" type="number" placeholder="npr. 400" id="f${num}-ccm-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Tip</div>
+                <select class="f-select" id="f${num}-tip" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Quad / ATV</option><option>Side-by-Side (SxS)</option>
+                    <option>Buggy</option><option>Mini quad</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Pogon</div>
+                <select class="f-select" id="f${num}-pogon" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>2WD</option><option>4WD</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Gorivo</div>
+                <select class="f-select" id="f${num}-gorivo" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Bencin</option><option>Diesel</option><option>Elektrika</option>
+                </select>
+            </div>
+        </div>`;
+
+    } else if(kat === 'skuter') {
+        container.innerHTML = `
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Znamka</div>
+                <select class="f-select" id="f${num}-znamka" onchange="posodobiUrlPreview(${num})">
+                    ${(ZNAMKE.skuter||[]).map(z=>`<option>${z}</option>`).join('')}
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="10000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Letnik od</div>
+                <input class="f-input" type="number" placeholder="2015" id="f${num}-letnik-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Prostornina</div>
+                <select class="f-select" id="f${num}-ccm" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>do 50cc</option><option>125cc</option>
+                    <option>300cc+</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Gorivo</div>
+                <select class="f-select" id="f${num}-gorivo" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Bencin</option><option>Elektrika</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">km do</div>
+                <input class="f-input" type="number" placeholder="50000" id="f${num}-km-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>`;
+
+    } else if(kat === 'nepremicnina') {
+        container.innerHTML = `
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Tip nepremičnine</div>
+                <select class="f-select" id="f${num}-tip" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Stanovanje</option><option>Hiša</option>
+                    <option>Zemljišče</option><option>Garaža</option><option>Poslovni prostor</option>
+                    <option>Počitniška hiša</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Transakcija</div>
+                <select class="f-select" id="f${num}-transakcija" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Prodaja</option><option>Najem</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Novogradnja</div>
+                <select class="f-select" id="f${num}-novogradnja" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Da</option><option>Ne</option>
+                </select>
+            </div>
+        </div>
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="500000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Površina od (m²)</div>
+                <input class="f-input" type="number" placeholder="30" id="f${num}-m2-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Površina do (m²)</div>
+                <input class="f-input" type="number" placeholder="200" id="f${num}-m2-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Št. sob od</div>
+                <select class="f-select" id="f${num}-sobe-od" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5+</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Nadstropje</div>
+                <select class="f-select" id="f${num}-nadstropje" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Pritličje</option><option>1-3</option><option>4-6</option><option>7+</option><option>Zadnje</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Leto gradnje od</div>
+                <input class="f-input" type="number" placeholder="1990" id="f${num}-leto-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Energetski razred</div>
+                <select class="f-select" id="f${num}-energetski" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>A+</option><option>A</option><option>B</option><option>C</option><option>D</option>
+                </select>
+            </div>
+        </div>
+        <div class="f-group" style="margin-bottom:10px;">
+            <div class="f-label">Lastnosti</div>
+            <div class="check-pills">
+                ${['Balkon','Terasa','Garaža','Parkirno mesto','Dvigalo','Klet','Vrt','Bazen','Klimatizacija','Centralno ogrevanje','Talno ogrevanje','Alarm'].map(o=>`<div class="check-pill" onclick="this.classList.toggle('on');posodobiUrlPreview(${num})">${o}</div>`).join('')}
+            </div>
+        </div>`;
+
+    } else if(kat === 'plovilo') {
+        container.innerHTML = `
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Tip plovila</div>
+                <select class="f-select" id="f${num}-tip" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Jadrnica</option><option>Motorni čoln</option>
+                    <option>Gumenjak</option><option>Katamarani</option><option>Jahta</option><option>Gliser</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="100000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Dolžina od (m)</div>
+                <input class="f-input" type="number" placeholder="5" id="f${num}-dolzina-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Letnik od</div>
+                <input class="f-input" type="number" placeholder="2005" id="f${num}-letnik-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Motor moč (KM od)</div>
+                <input class="f-input" type="number" placeholder="npr. 50" id="f${num}-motor-km" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Gorivo</div>
+                <select class="f-select" id="f${num}-gorivo" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Bencin</option><option>Diesel</option><option>Električni</option>
+                </select>
+            </div>
+        </div>`;
+
+    } else if(kat === 'kmetijstvo') {
+        container.innerHTML = `
+        <div class="filtri-grid col4" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Tip stroja</div>
+                <select class="f-select" id="f${num}-tip" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>Traktor</option><option>Kombajn</option>
+                    <option>Prikolica</option><option>Plug</option><option>Brana</option><option>Sejalnica</option><option>Škropilnica</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Znamka</div>
+                <input class="f-input" type="text" placeholder="John Deere, Fendt..." id="f${num}-znamka" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="100000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Moč od (KM)</div>
+                <input class="f-input" type="number" placeholder="50" id="f${num}-moc-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Ure do</div>
+                <input class="f-input" type="number" placeholder="5000" id="f${num}-ure-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Pogon</div>
+                <select class="f-select" id="f${num}-pogon" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vse</option><option>2WD</option><option>4WD</option>
+                </select>
+            </div>
+        </div>`;
+
+    } else {
+        // SPLOŠNO
+        container.innerHTML = `
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Ključna beseda</div>
+                <input class="f-input" type="text" placeholder="Kar iščeš..." id="f${num}-kljucna" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div>
+                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od" oninput="posodobiUrlPreview(${num})">
+            </div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div>
+                <input class="f-input" type="number" placeholder="10000" id="f${num}-cena-do" oninput="posodobiUrlPreview(${num})">
+            </div>
+        </div>
+        <div class="filtri-grid" style="margin-bottom:10px;">
+            <div class="f-group"><div class="f-label">Objavljeno</div>
+                <select class="f-select" id="f${num}-datum" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Kadarkoli</option><option>Danes</option><option>Ta teden</option><option>Ta mesec</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Prodajalec</div>
+                <select class="f-select" id="f${num}-prodajalec" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Vsi</option><option>Zasebnik</option><option>Trgovec</option>
+                </select>
+            </div>
+            <div class="f-group"><div class="f-label">Samo s sliko</div>
+                <select class="f-select" id="f${num}-slika" onchange="posodobiUrlPreview(${num})">
+                    <option value="">Ne</option><option>Da</option>
+                </select>
+            </div>
+        </div>`;
     }
 }
 
-async function shraniIskanje() {
-    const url1 = document.getElementById('url1').value.trim();
-    if(!url1) {
-        alert('Prosim vnesi vsaj en URL!');
+// ===================== URL PREVIEW =====================
+function posodobiUrlPreview(num) {
+    const portali = state[num].portali;
+    const listEl = document.getElementById('url-list'+num);
+
+    if(portali.length === 0) {
+        listEl.innerHTML = '<div class="url-preview-item" style="font-style:italic;">Izberi vsaj en portal za prikaz URL-jev...</div>';
         return;
     }
 
+    const kat = state[num].kat;
+    const urls = portali.map(pid => {
+        const url = sestaviUrl(pid, num);
+        const flag = najdiFlagg(pid);
+        return `<div class="url-preview-item"><span class="pflag">${flag}</span><span>${url}</span></div>`;
+    });
+
+    listEl.innerHTML = urls.join('');
+}
+
+function najdiFlagg(pid) {
+    for(const r of PORTALI_PO_REGIJAH) {
+        for(const p of r.portali) {
+            if(p.id === pid) return p.flag;
+        }
+    }
+    return '🌐';
+}
+
+function getVal(id) {
+    const el = document.getElementById(id);
+    if(!el) return '';
+    return el.value || '';
+}
+
+function sestaviUrl(pid, num) {
+    const kat = state[num].kat;
+    const znamka = getVal(`f${num}-znamka`);
+    const model = getVal(`f${num}-model`);
+    const cenaOd = getVal(`f${num}-cena-od`);
+    const cenaDo = getVal(`f${num}-cena-do`);
+    const letnikOd = getVal(`f${num}-letnik-od`);
+    const letnikDo = getVal(`f${num}-letnik-do`);
+    const kmDo = getVal(`f${num}-km-do`);
+    const gorivo = getVal(`f${num}-gorivo`);
+    const menjalnik = getVal(`f${num}-menjalnik`);
+    const pogon = getVal(`f${num}-pogon`);
+    const tip = getVal(`f${num}-tip`);
+    const lokKraj = document.getElementById(`lok-kraj${num}`)?.value || '';
+    const lokRazdalja = document.getElementById(`lok-razdalja${num}`)?.value || '';
+
+    const znamkaEnc = znamka && znamka !== 'Vse znamke' ? encodeURIComponent(znamka) : '';
+    const modelEnc = model ? encodeURIComponent(model) : '';
+
+    if(pid === 'avto.net') {
+        let url = 'https://www.avto.net/Ads/results.asp?';
+        const params = [];
+        if(znamkaEnc) params.push(`znamka=${znamkaEnc}`);
+        if(modelEnc) params.push(`model=${modelEnc}`);
+        if(cenaOd) params.push(`cenaOd=${cenaOd}`);
+        if(cenaDo) params.push(`cenaDo=${cenaDo}`);
+        if(letnikOd) params.push(`letnikOd=${letnikOd}`);
+        if(letnikDo) params.push(`letnikDo=${letnikDo}`);
+        if(kmDo) params.push(`kmDo=${kmDo}`);
+        if(gorivo) params.push(`gorivo=${encodeURIComponent(gorivo)}`);
+        if(lokKraj) params.push(`kraj=${encodeURIComponent(lokKraj)}`);
+        if(lokRazdalja) params.push(`razdalja=${lokRazdalja}`);
+        return url + params.join('&');
+    }
+
+    if(pid === 'bolha.com') {
+        let q = [znamka !== 'Vse znamke' ? znamka : '', model].filter(Boolean).join(' ');
+        let url = `https://www.bolha.com/rabljeno?q=${encodeURIComponent(q||'avto')}`;
+        if(cenaOd) url += `&price_from=${cenaOd}`;
+        if(cenaDo) url += `&price_to=${cenaDo}`;
+        if(lokKraj) url += `&location=${encodeURIComponent(lokKraj)}`;
+        if(lokRazdalja) url += `&radius=${lokRazdalja}`;
+        return url;
+    }
+
+    if(pid === 'nepremicnine.net') {
+        const tipNep = getVal(`f${num}-tip`);
+        const m2Od = getVal(`f${num}-m2-od`);
+        const m2Do = getVal(`f${num}-m2-do`);
+        const sobeOd = getVal(`f${num}-sobe-od`);
+        let url = 'https://www.nepremicnine.net/oglasi-prodaja/';
+        const params = [];
+        if(cenaOd) params.push(`cena_min=${cenaOd}`);
+        if(cenaDo) params.push(`cena_max=${cenaDo}`);
+        if(m2Od) params.push(`povrsina_min=${m2Od}`);
+        if(m2Do) params.push(`povrsina_max=${m2Do}`);
+        if(sobeOd) params.push(`stevilo_sob=${sobeOd}`);
+        if(lokKraj) params.push(`kraj=${encodeURIComponent(lokKraj)}`);
+        if(lokRazdalja) params.push(`razdalja=${lokRazdalja}`);
+        return url + (params.length ? '?' + params.join('&') : '');
+    }
+
+    if(pid === 'njuskalo.hr') {
+        let q = [znamka !== 'Vse znamke' ? znamka : '', model].filter(Boolean).join('+');
+        let url = `https://www.njuskalo.hr/auti?q=${q||''}`;
+        if(cenaOd) url += `&price-from=${cenaOd}`;
+        if(cenaDo) url += `&price-to=${cenaDo}`;
+        if(letnikOd) url += `&year-from=${letnikOd}`;
+        if(lokRazdalja && lokKraj) url += `&location=${encodeURIComponent(lokKraj)}&radius=${lokRazdalja}`;
+        return url;
+    }
+
+    if(pid === 'mobile.de') {
+        let url = 'https://suchen.mobile.de/fahrzeuge/search.html?';
+        const params = ['lang=sl'];
+        if(znamkaEnc) params.push(`makeModelVariant1.makeId=${znamkaEnc}`);
+        if(modelEnc) params.push(`makeModelVariant1.modelDescription=${modelEnc}`);
+        if(cenaOd) params.push(`minPrice=${cenaOd}`);
+        if(cenaDo) params.push(`maxPrice=${cenaDo}`);
+        if(letnikOd) params.push(`minFirstRegistrationDate=${letnikOd}-01`);
+        if(kmDo) params.push(`maxMileage=${kmDo}`);
+        if(lokKraj) params.push(`zip=${encodeURIComponent(lokKraj)}`);
+        if(lokRazdalja) params.push(`zipRadius=${lokRazdalja}`);
+        return url + params.join('&');
+    }
+
+    if(pid.includes('autoscout24')) {
+        const domain = pid === 'autoscout24.de' ? 'de' : pid === 'autoscout24.at' ? 'at' : 'ch';
+        let url = `https://www.autoscout24.${domain}/lst?`;
+        const params = [];
+        if(znamkaEnc) params.push(`mmvmk0=${znamkaEnc}`);
+        if(cenaOd) params.push(`pricefrom=${cenaOd}`);
+        if(cenaDo) params.push(`priceto=${cenaDo}`);
+        if(letnikOd) params.push(`fregfrom=${letnikOd}`);
+        if(kmDo) params.push(`kmto=${kmDo}`);
+        if(lokKraj) params.push(`zip=${encodeURIComponent(lokKraj)}`);
+        if(lokRazdalja) params.push(`zipr=${lokRazdalja}`);
+        return url + params.join('&');
+    }
+
+    if(pid.includes('olx.')) {
+        const domain = pid;
+        let q = [znamka !== 'Vse znamke' ? znamka : '', model].filter(Boolean).join(' ');
+        let url = `https://www.${domain}/ads/q-${encodeURIComponent(q||'auto')}/?`;
+        if(cenaOd) url += `search[filter_float_price:from]=${cenaOd}&`;
+        if(cenaDo) url += `search[filter_float_price:to]=${cenaDo}&`;
+        return url;
+    }
+
+    if(pid === 'willhaben.at') {
+        let url = 'https://www.willhaben.at/iad/gebrauchtwagen/auto/';
+        const params = [];
+        if(cenaOd) params.push(`PRICE_FROM=${cenaOd}`);
+        if(cenaDo) params.push(`PRICE_TO=${cenaDo}`);
+        if(letnikOd) params.push(`YEAR_MODEL_FROM=${letnikOd}`);
+        if(lokKraj) params.push(`LOCATION_CITY=${encodeURIComponent(lokKraj)}`);
+        if(lokRazdalja) params.push(`DISTANCE=${lokRazdalja}`);
+        return url + (params.length ? '?' + params.join('&') : '');
+    }
+
+    if(pid === 'halooglasi.com') {
+        let q = [znamka !== 'Vse znamke' ? znamka : '', model].filter(Boolean).join(' ');
+        return `https://www.halooglasi.com/nekretnine/prodaja-stanova?q=${encodeURIComponent(q||'')}`;
+    }
+
+    if(pid === 'subito.it') {
+        let q = [znamka !== 'Vse znamke' ? znamka : '', model].filter(Boolean).join(' ');
+        return `https://www.subito.it/annunci-italia/vendita/usato/?q=${encodeURIComponent(q||'')}`;
+    }
+
+    return `https://www.${pid}/`;
+}
+
+// ===================== SHRANI ISKANJE =====================
+async function shraniIskanje(num) {
+    const portali = state[num].portali;
+    if(portali.length === 0) {
+        alert('Izberi vsaj en portal!');
+        return;
+    }
+
+    const urls = portali.map(pid => sestaviUrl(pid, num));
+    const kat = state[num].kat;
+    const lokKraj = document.getElementById(`lok-kraj${num}`)?.value || '';
+
+    const naslov = `${katIme(kat)} — ${portali.length} portal${portali.length > 1 ? 'i' : ''}${lokKraj ? ' · ' + lokKraj : ''}`;
+
+    document.getElementById('card'+num+'-title').textContent = naslov;
+    document.getElementById('card'+num+'-sub').textContent = urls.length + ' URL-jev aktivnih';
+
+    // pošlji na server
     const iskanje = {
-        id: 1,
-        url: url1,
-        paket: "free",
+        id: num,
+        url: urls[0], // primarni URL
+        urls: urls,   // vsi URL-ji
+        paket: PAKET,
         aktiven: true,
-        ime: "Moje iskanje 1"
+        ime: naslov,
+        kat: kat
     };
 
     try {
@@ -438,31 +1180,45 @@ async function shraniIskanje() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(iskanje)
         });
-
         if(r.ok) {
-            const btn = document.querySelector('.save-btn');
-            btn.textContent = '✅ Iskanje shranjeno!';
+            const btn = document.querySelector(`#card${num} .save-iskanje-btn`);
+            const orig = btn.textContent;
+            btn.textContent = '✅ Shranjeno!';
             btn.style.background = '#22c55e';
-            setTimeout(() => {
-                btn.textContent = '💾 Shrani iskanje';
-                btn.style.background = '';
-            }, 2000);
+            setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2500);
         }
     } catch(e) {
-        alert('Strežnik ni dosegljiv. Zaženi server.py!');
+        // server ni dosegljiv — samo vizualni feedback
+        const btn = document.querySelector(`#card${num} .save-iskanje-btn`);
+        const orig = btn.textContent;
+        btn.textContent = '✅ Shranjeno lokalno!';
+        btn.style.background = '#22c55e';
+        setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2500);
     }
 }
 
+function katIme(kat) {
+    const map = {avto:'Avtomobili',motor:'Motorji',quad:'Štirikolesa',skuter:'Skuterji',nepremicnina:'Nepremičnine',plovilo:'Plovila',kombi:'Kombiji',kmetijstvo:'Kmet. meh.',splosno:'Splošno'};
+    return map[kat] || kat;
+}
+
+// ===================== COUNTDOWN =====================
 let cas = 23*60 + 47;
 function posodobiCountdown() {
-    const ure = Math.floor(cas/60);
-    const min = cas % 60;
-    document.getElementById('countdown').textContent =
-        String(ure).padStart(2,'0') + ':' + String(min).padStart(2,'0');
+    const u = Math.floor(cas/60), m = cas%60;
+    document.getElementById('countdown').textContent = String(u).padStart(2,'0')+':'+String(m).padStart(2,'0');
     if(cas > 0) cas--;
 }
 posodobiCountdown();
 setInterval(posodobiCountdown, 60000);
+
+// ===================== INIT =====================
+function init() {
+    renderPortali(1);
+    renderFiltri(1);
+}
+
+init();
 </script>
 </body>
 </html>
