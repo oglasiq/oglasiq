@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OglasIQ — Registracija</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        :root{--bg:#080810;--surface:#0f0f1a;--border:#1a1a2e;--text:#ffffff;--muted:#6b7280;--accent:#5b6cf9;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+        nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:56px;background:rgba(8,8,16,0.95);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);}
+        .logo{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;text-decoration:none;color:#fff;}
+        .logo-ring{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;}
+        .logo-dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--accent);}
+        .nav-right{font-size:13px;color:var(--muted);}
+        .nav-right a{color:var(--accent);text-decoration:none;margin-left:6px;}
+        .main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 24px;}
+        .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;width:100%;max-width:460px;}
+        .card-title{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:6px;}
+        .card-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+        .steps-indicator{display:flex;gap:6px;margin-bottom:28px;}
+        .step-dot{height:3px;border-radius:2px;flex:1;background:var(--border);transition:background 0.3s;}
+        .step-dot.active{background:var(--accent);}
+        .step-dot.done{background:#22c55e;}
+        .form-group{margin-bottom:16px;}
+        .form-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;display:block;}
+        .form-input{width:100%;background:var(--bg);border:1px solid var(--border);color:#fff;padding:10px 14px;border-radius:8px;font-size:14px;outline:none;transition:border-color 0.2s;}
+        .form-input:focus{border-color:var(--accent);}
+        .form-input::placeholder{color:#374151;}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+        .password-wrap{position:relative;}
+        .password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;}
+        .strength-bar{height:3px;border-radius:2px;margin-top:6px;background:var(--border);overflow:hidden;}
+        .strength-fill{height:100%;border-radius:2px;transition:width 0.3s,background 0.3s;}
+        .strength-text{font-size:11px;color:var(--muted);margin-top:4px;}
+        .form-check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;margin-bottom:16px;}
+        .form-check input{margin-top:2px;accent-color:var(--accent);cursor:pointer;}
+        .form-check span{font-size:13px;color:var(--muted);line-height:1.5;}
+        .form-check a{color:var(--accent);text-decoration:none;}
+        .btn-submit{width:100%;background:var(--accent);color:#fff;border:none;padding:12px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;transition:opacity 0.2s;margin-top:4px;}
+        .btn-submit:hover{opacity:0.85;}
+        .divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+        .divider-line{flex:1;height:1px;background:var(--border);}
+        .divider span{font-size:12px;color:var(--muted);}
+        .social-btn{width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);padding:10px;border-radius:10px;font-size:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+        .social-btn:hover{border-color:#333;color:#fff;}
+        .login-link{text-align:center;font-size:13px;color:var(--muted);margin-top:20px;}
+        .login-link a{color:var(--accent);text-decoration:none;}
+        .step-content{display:none;}
+        .step-content.active{display:block;}
+        .back-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;display:flex;align-items:center;gap:4px;padding:0;}
+        .back-btn:hover{color:#fff;}
+        .error-msg{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;}
+        .error-msg.show{display:block;}
+        .verify-inputs{display:flex;gap:8px;justify-content:center;margin:20px 0;}
+        .verify-input{width:48px;height:56px;background:var(--bg);border:1px solid var(--border);color:#fff;font-size:22px;font-weight:700;text-align:center;border-radius:8px;outline:none;}
+        .verify-input:focus{border-color:var(--accent);}
+
+        /* PAKETI */
+        .plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:20px;}
+        .plan-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.2s;text-align:left;position:relative;}
+        .plan-card.selected{border-color:var(--accent);background:#1a1a3a;}
+        .plan-card:hover{border-color:#333;}
+        .plan-name{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+        .plan-card.selected .plan-name{color:var(--accent);}
+        .plan-price{font-size:22px;font-weight:700;letter-spacing:-0.5px;margin-bottom:2px;}
+        .plan-interval{font-size:10px;color:#22c55e;margin-bottom:6px;}
+        .plan-features{font-size:11px;color:var(--muted);line-height:1.8;}
+        .popular-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:9px;font-weight:600;padding:2px 10px;border-radius:10px;white-space:nowrap;}
+
+        /* OBVESTILA */
+        .notif-options{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+        .notif-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px;}
+        .notif-card.selected{border-color:var(--accent);background:#1a1a3a;}
+        .notif-card.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none;}
+        .notif-icon{font-size:20px;width:36px;text-align:center;}
+        .notif-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+        .notif-desc{font-size:11px;color:var(--muted);}
+        .notif-lock{font-size:11px;color:#ef4444;margin-top:2px;}
+        .notif-cb{margin-left:auto;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+        .notif-card.selected .notif-cb{background:var(--accent);border-color:var(--accent);}
+
+        /* SUCCESS */
+        .success-wrap{text-align:center;padding:20px 0;}
+        .success-icon{width:64px;height:64px;background:rgba(34,197,94,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+        .success-title{font-size:20px;font-weight:700;margin-bottom:8px;}
+        .success-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:24px;}
+        .btn-dashboard{display:block;background:var(--accent);color:#fff;text-align:center;padding:12px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;}
+
+        footer{padding:20px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+        footer p{font-size:12px;color:var(--muted);}
+        footer a{color:var(--muted);text-decoration:none;font-size:12px;}
+        footer a:hover{color:#fff;}
+    </style>
+</head>
+<body>
+<nav>
+    <a href="index.html" class="logo">
+        <div class="logo-ring"><div class="logo-dot"></div></div>
+        OglasIQ
+    </a>
+    <div class="nav-right">Že imaš račun? <a href="prijava.html">Prijava</a></div>
+</nav>
+
+<div class="main">
+    <div class="card">
+        <div class="steps-indicator">
+            <div class="step-dot active" id="dot-1"></div>
+            <div class="step-dot" id="dot-2"></div>
+            <div class="step-dot" id="dot-3"></div>
+            <div class="step-dot" id="dot-4"></div>
+        </div>
+
+        <!-- KORAK 1 -->
+        <div class="step-content active" id="step-1">
+            <div class="card-title">Ustvari račun</div>
+            <div class="card-sub">Začni brezplačno. Ne potrebuješ kreditne kartice.</div>
+            <div class="error-msg" id="error-1">Prosim izpolni vsa polja.</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Ime</label>
+                    <input class="form-input" type="text" placeholder="Janez" id="ime">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priimek</label>
+                    <input class="form-input" type="text" placeholder="Novak" id="priimek">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email naslov</label>
+                <input class="form-input" type="email" placeholder="janez@gmail.com" id="email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Geslo</label>
+                <div class="password-wrap">
+                    <input class="form-input" type="password" placeholder="Najmanj 8 znakov" id="geslo" oninput="checkStrength(this.value)">
+                    <button class="password-toggle" onclick="togglePassword()">👁</button>
+                </div>
+                <div class="strength-bar"><div class="strength-fill" id="strength-fill" style="width:0%"></div></div>
+                <div class="strength-text" id="strength-text"></div>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" id="pogoji">
+                <span>Strinjam se s <a href="#">pogoji uporabe</a> in <a href="#">politiko zasebnosti</a></span>
+            </div>
+            <button class="btn-submit" onclick="korak1()">Naprej →</button>
+            <div class="divider"><div class="divider-line"></div><span>ali</span><div class="divider-line"></div></div>
+            <button class="social-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34a853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fbbc05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#ea4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Nadaljuj z Google
+            </button>
+            <div class="login-link">Že imaš račun? <a href="prijava.html">Prijava</a></div>
+        </div>
+
+        <!-- KORAK 2 -->
+        <div class="step-content" id="step-2">
+            <button class="back-btn" onclick="pojdiNa(1)">← Nazaj</button>
+            <div class="card-title">Potrdi email</div>
+            <div class="card-sub">Poslali smo 6-mestno kodo na <strong id="verify-email"></strong></div>
+            <div class="verify-inputs">
+                <input class="verify-input" maxlength="1" oninput="nextInput(this,1)">
+                <input class="verify-input" maxlength="1" oninput="nextInput(this,2)">
+                <input class="verify-input" maxlength="1" oninput="nextInput(this,3)">
+                <input class="verify-input" maxlength="1" oninput="nextInput(this,4)">
+                <input class="verify-input" maxlength="1" oninput="nextInput(this,5)">
+                <input class="verify-input" maxlength="1" oninput="nextInput(this,6)">
+            </div>
+            <button class="btn-submit" onclick="korak2()">Potrdi →</button>
+            <div class="login-link" style="margin-top:16px;">Nisi prejel kode? <a href="#" onclick="alert('Koda poslana!')">Pošlji ponovno</a></div>
+        </div>
+
+        <!-- KORAK 3 — PAKETI -->
+        <div class="step-content" id="step-3">
+            <button class="back-btn" onclick="pojdiNa(2)">← Nazaj</button>
+            <div class="card-title">Izberi paket</div>
+            <div class="card-sub">Začni brezplačno, nadgradi kadarkoli. Brez vezave.</div>
+            <div class="plan-grid">
+                <div class="plan-card selected" onclick="izberPaket(this,'free')">
+                    <div class="plan-name">Free</div>
+                    <div class="plan-price">0€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
+                    <div class="plan-interval">⏱ Vsake 24 ur</div>
+                    <div class="plan-features">✓ 1 URL iskanje<br>✓ Email obvestila<br>✓ 7 dni zgodovina</div>
+                </div>
+                <div class="plan-card" onclick="izberPaket(this,'starter')">
+                    <div class="plan-name">Starter</div>
+                    <div class="plan-price">3€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
+                    <div class="plan-interval">⏱ Vsake 3 ure</div>
+                    <div class="plan-features">✓ 2 URL iskanja<br>✓ Telegram + Email<br>✓ 30 dni zgodovina</div>
+                </div>
+                <div class="plan-card" onclick="izberPaket(this,'pro')" style="position:relative;">
+                    <div class="popular-tag">Najbolj priljubljen</div>
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-price">7€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
+                    <div class="plan-interval">⏱ Vsako uro</div>
+                    <div class="plan-features">✓ 4 URL iskanja<br>✓ Telegram + Email<br>✓ Sprememba cene</div>
+                </div>
+                <div class="plan-card" onclick="izberPaket(this,'premium')">
+                    <div class="plan-name">Premium</div>
+                    <div class="plan-price">15€ <small style="font-size:12px;color:var(--muted);font-weight:400;">/mes</small></div>
+                    <div class="plan-interval">⏱ Vsake 20 min</div>
+                    <div class="plan-features">✓ 5 URL iskanj<br>✓ Telegram + Email<br>✓ Neomejena zgodovina</div>
+                </div>
+            </div>
+            <button class="btn-submit" onclick="korak3()">Naprej →</button>
+        </div>
+
+        <!-- KORAK 4 — OBVESTILA -->
+        <div class="step-content" id="step-4">
+            <button class="back-btn" onclick="pojdiNa(3)">← Nazaj</button>
+            <div class="card-title">Kako te obvestimo?</div>
+            <div class="card-sub" id="notif-sub">Izberi način prejemanja obvestil.</div>
+            <div class="notif-options" id="notif-options">
+                <!-- Dinamično glede na paket -->
+            </div>
+            <button class="btn-submit" onclick="korak4()">Dokončaj registracijo →</button>
+        </div>
+
+        <!-- USPEH -->
+        <div class="step-content" id="step-success">
+            <div class="success-wrap">
+                <div class="success-icon">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <path d="M6 16l7 7 13-13" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div class="success-title">Dobrodošel v OglasIQ! 🎉</div>
+                <div class="success-sub" id="success-sub">Tvoj račun je ustvarjen. Zdaj nastavi prvo iskanje!</div>
+                <a href="dashboard.html" class="btn-dashboard">Pojdi na Dashboard →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 OglasIQ</p>
+    <div style="display:flex;gap:20px;">
+        <a href="#">Pogoji uporabe</a>
+        <a href="#">Zasebnost</a>
+        <a href="#">Pomoč</a>
+    </div>
+</footer>
+
+<script>
+let trenutniKorak = 1;
+let izbranPaket = 'free';
+
+const paketObvestila = {
+    free: {
+        opcije: [
+            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true}
+        ],
+        sub: 'Free paket vključuje email obvestila.'
+    },
+    starter: {
+        opcije: [
+            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram', dostopno:true},
+            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true},
+            {icon:'🔔', title:'Oboje', desc:'Telegram + Email obvestila', id:'oboje', dostopno:true}
+        ],
+        sub: 'Starter paket vključuje Telegram in Email obvestila.'
+    },
+    pro: {
+        opcije: [
+            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram', dostopno:true},
+            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true},
+            {icon:'🔔', title:'Oboje', desc:'Telegram + Email obvestila', id:'oboje', dostopno:true}
+        ],
+        sub: 'Pro paket vključuje Telegram in Email obvestila.'
+    },
+    premium: {
+        opcije: [
+            {icon:'📱', title:'Telegram', desc:'Takojšnja obvestila na telefon', id:'telegram', dostopno:true},
+            {icon:'📧', title:'Email', desc:'Obvestila na tvoj email naslov', id:'email', dostopno:true},
+            {icon:'🔔', title:'Oboje', desc:'Telegram + Email — Priporočeno', id:'oboje', dostopno:true}
+        ],
+        sub: 'Premium paket vključuje vse načine obvestil.'
+    }
+};
+
+function pojdiNa(korak) {
+    document.getElementById('step-' + trenutniKorak).classList.remove('active');
+    if(korak === 'success') {
+        document.getElementById('step-success').classList.add('active');
+        for(let i=1;i<=4;i++) document.getElementById('dot-'+i).classList.add('done');
+        return;
+    }
+    trenutniKorak = korak;
+    document.getElementById('step-' + korak).classList.add('active');
+    for(let i=1;i<=4;i++) {
+        const dot = document.getElementById('dot-'+i);
+        dot.classList.remove('active','done');
+        if(i < korak) dot.classList.add('done');
+        else if(i === korak) dot.classList.add('active');
+    }
+}
+
+function korak1() {
+    const ime = document.getElementById('ime').value;
+    const priimek = document.getElementById('priimek').value;
+    const email = document.getElementById('email').value;
+    const geslo = document.getElementById('geslo').value;
+    const pogoji = document.getElementById('pogoji').checked;
+    const error = document.getElementById('error-1');
+    if(!ime||!priimek||!email||!geslo||!pogoji) {
+        error.classList.add('show');
+        error.textContent = !pogoji ? 'Strinjati se moraš s pogoji.' : 'Prosim izpolni vsa polja.';
+        return;
+    }
+    if(geslo.length < 8) {
+        error.classList.add('show');
+        error.textContent = 'Geslo mora imeti najmanj 8 znakov.';
+        return;
+    }
+    error.classList.remove('show');
+    document.getElementById('verify-email').textContent = email;
+    pojdiNa(2);
+}
+
+function korak2() {
+    const inputs = document.querySelectorAll('.verify-input');
+    let koda = '';
+    inputs.forEach(i => koda += i.value);
+    if(koda.length < 6) { alert('Vnesi 6-mestno kodo.'); return; }
+    pojdiNa(3);
+}
+
+function korak3() {
+    // Pripravi obvestila glede na paket
+    const config = paketObvestila[izbranPaket];
+    document.getElementById('notif-sub').textContent = config.sub;
+    const container = document.getElementById('notif-options');
+    container.innerHTML = '';
+    config.opcije.forEach((op, idx) => {
+        const div = document.createElement('div');
+        div.className = 'notif-card' + (idx === 0 ? ' selected' : '');
+        div.onclick = () => izberNotif(div);
+        div.innerHTML = `
+            <div class="notif-icon">${op.icon}</div>
+            <div>
+                <div class="notif-title">${op.title}</div>
+                <div class="notif-desc">${op.desc}</div>
+            </div>
+            <div class="notif-cb">
+                <svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" fill="none" stroke="white" stroke-width="1.5"/></svg>
+            </div>`;
+        container.appendChild(div);
+    });
+    pojdiNa(4);
+}
+
+function korak4() {
+    const sub = izbranPaket === 'free'
+        ? 'Tvoj Free račun je aktiven. Nastavi iskanje in začni prejemati obvestila!'
+        : `Tvoj ${izbranPaket.charAt(0).toUpperCase()+izbranPaket.slice(1)} račun je aktiven. Uživaj v naprednih funkcijah!`;
+    document.getElementById('success-sub').textContent = sub;
+    pojdiNa('success');
+}
+
+function izberPaket(el, paket) {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    izbranPaket = paket;
+}
+
+function izberNotif(el) {
+    document.querySelectorAll('.notif-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+}
+
+function checkStrength(val) {
+    const fill = document.getElementById('strength-fill');
+    const text = document.getElementById('strength-text');
+    let s = 0;
+    if(val.length >= 8) s++;
+    if(/[A-Z]/.test(val)) s++;
+    if(/[0-9]/.test(val)) s++;
+    if(/[^A-Za-z0-9]/.test(val)) s++;
+    const l = [{w:'0%',c:'#ef4444',t:''},{w:'25%',c:'#ef4444',t:'Šibko'},{w:'50%',c:'#f59e0b',t:'Srednje'},{w:'75%',c:'#3b82f6',t:'Dobro'},{w:'100%',c:'#22c55e',t:'Odlično'}];
+    fill.style.width = l[s].w;
+    fill.style.background = l[s].c;
+    text.textContent = l[s].t;
+    text.style.color = l[s].c;
+}
+
+function togglePassword() {
+    const input = document.getElementById('geslo');
+    input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function nextInput(el, idx) {
+    if(el.value && idx < 6) document.querySelectorAll('.verify-input')[idx].focus();
+}
+</script>
+</body>
+</html>

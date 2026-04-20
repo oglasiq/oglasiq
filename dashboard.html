@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OglasIQ — Dashboard</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        :root{--bg:#080810;--surface:#0f0f1a;--border:#1a1a2e;--text:#ffffff;--muted:#6b7280;--accent:#5b6cf9;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+
+        .sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:50;}
+        .sidebar-logo{display:flex;align-items:center;gap:10px;padding:20px;border-bottom:1px solid var(--border);font-size:15px;font-weight:600;}
+        .logo-ring{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;}
+        .logo-dot{width:9px;height:9px;border-radius:50%;border:1px solid var(--accent);}
+        .sidebar-nav{flex:1;padding:12px 0;overflow-y:auto;}
+        .nav-section{padding:8px 16px 4px;font-size:10px;font-weight:600;color:#374151;letter-spacing:0.08em;text-transform:uppercase;}
+        .nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13px;color:var(--muted);cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;text-decoration:none;}
+        .nav-item:hover{color:#fff;background:rgba(255,255,255,0.03);}
+        .nav-item.active{color:#fff;background:rgba(91,108,249,0.08);border-left-color:var(--accent);}
+        .nav-icon{width:16px;text-align:center;font-size:14px;}
+        .nav-badge{margin-left:auto;background:var(--accent);color:#fff;font-size:10px;padding:2px 6px;border-radius:10px;}
+        .sidebar-user{padding:16px;border-top:1px solid var(--border);}
+        .user-row{display:flex;align-items:center;gap:10px;}
+        .user-av{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+        .user-name{font-size:13px;font-weight:500;}
+        .user-plan{font-size:11px;color:var(--accent);}
+        .user-logout{margin-left:auto;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;}
+
+        .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+        .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px;border-bottom:1px solid var(--border);background:rgba(8,8,16,0.95);backdrop-filter:blur(12px);position:sticky;top:0;z-index:40;}
+        .topbar-title{font-size:15px;font-weight:600;}
+        .topbar-right{display:flex;align-items:center;gap:12px;}
+        .notif-btn{background:var(--surface);border:1px solid var(--border);color:var(--muted);width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;position:relative;}
+        .notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;background:#ef4444;border-radius:50%;border:1.5px solid var(--bg);}
+        .btn-new{background:var(--accent);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;}
+
+        .content{padding:28px;flex:1;}
+
+        /* STATS */
+        .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+        .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;}
+        .stat-label{font-size:12px;color:var(--muted);margin-bottom:8px;}
+        .stat-val{font-size:26px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
+        .stat-change{font-size:11px;color:#22c55e;}
+
+        .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+        .section-title{font-size:15px;font-weight:600;}
+        .section-link{font-size:12px;color:var(--accent);cursor:pointer;background:none;border:none;}
+
+        /* URL ISKANJA */
+        .url-section{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;}
+        .url-section-title{font-size:14px;font-weight:600;margin-bottom:6px;}
+        .url-section-sub{font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+
+        .url-slots{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+        .url-slot{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;}
+        .url-slot-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+        .url-slot-num{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;}
+        .url-slot-status{display:flex;align-items:center;gap:5px;font-size:11px;}
+        .status-dot{width:7px;height:7px;border-radius:50%;}
+        .status-dot.on{background:#22c55e;}
+        .status-dot.off{background:#4b5563;}
+        .url-input-row{display:flex;gap:8px;}
+        .url-input{flex:1;background:var(--surface);border:1px solid var(--border);color:#fff;padding:9px 12px;border-radius:8px;font-size:12px;outline:none;transition:border-color 0.2s;}
+        .url-input:focus{border-color:var(--accent);}
+        .url-input::placeholder{color:#374151;}
+        .url-detect-btn{background:var(--accent);color:#fff;border:none;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;}
+        .url-detect-btn:hover{opacity:0.85;}
+        .url-detect-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+        .detected-info{display:none;margin-top:10px;background:rgba(91,108,249,0.06);border:1px solid rgba(91,108,249,0.15);border-radius:8px;padding:10px 12px;}
+        .detected-info.show{display:block;}
+        .detected-portal{font-size:12px;font-weight:600;color:#a5b4fc;margin-bottom:4px;}
+        .detected-cat{font-size:11px;color:var(--muted);}
+
+        .url-filters{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+        .url-filters.show{display:block;}
+        .filter-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px;}
+        .f-group label{font-size:10px;color:var(--muted);display:block;margin-bottom:4px;}
+        .f-input{width:100%;background:var(--surface);border:1px solid var(--border);color:#fff;padding:7px 10px;border-radius:6px;font-size:11px;outline:none;}
+        .f-input:focus{border-color:var(--accent);}
+        .f-select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:6px;font-size:11px;outline:none;cursor:pointer;}
+        .checks-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;}
+        .check-pill{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all 0.15s;}
+        .check-pill.on{background:rgba(91,108,249,0.15);border-color:var(--accent);color:#a5b4fc;}
+
+        .url-slot.locked{opacity:0.4;pointer-events:none;position:relative;}
+        .locked-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,8,16,0.7);border-radius:10px;font-size:12px;color:var(--muted);}
+
+        .save-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;}
+        .save-btn:hover{opacity:0.85;}
+
+        /* OBVESTILA */
+        .obvestila-list{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
+        .ob-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;cursor:pointer;transition:border-color 0.15s;}
+        .ob-card:hover{border-color:#2a2a3a;}
+        .ob-card.novo{border-left:2px solid var(--accent);}
+        .ob-icon{width:40px;height:40px;background:var(--bg);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+        .ob-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+        .ob-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;}
+        .ob-price{font-size:15px;font-weight:700;text-align:right;}
+        .ob-portal{font-size:10px;color:var(--accent);text-align:right;margin-top:2px;}
+        .ob-time{font-size:10px;color:var(--muted);text-align:right;margin-top:2px;}
+        .novo-badge{background:rgba(91,108,249,0.15);color:#a5b4fc;font-size:9px;padding:2px 5px;border-radius:3px;margin-left:6px;}
+
+        /* SPODAJ */
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+        .paket-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+        .paket-name{font-size:12px;font-weight:600;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:8px;}
+        .paket-price{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:4px;}
+        .paket-price small{font-size:13px;color:var(--muted);font-weight:400;}
+        .paket-interval{font-size:12px;color:#22c55e;margin-bottom:12px;}
+        .paket-feats{list-style:none;margin:14px 0;}
+        .paket-feats li{font-size:13px;color:#9ca3af;padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+        .paket-feats li::before{content:"✓";color:var(--accent);font-size:11px;}
+        .upgrade-btn{width:100%;background:var(--accent);color:#fff;border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;margin-top:4px;}
+
+        .graf-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+        .graf-bars{display:flex;align-items:flex-end;gap:8px;height:80px;margin-top:16px;}
+        .graf-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+        .graf-bar{width:100%;background:var(--accent);border-radius:3px 3px 0 0;opacity:0.7;}
+        .graf-label{font-size:10px;color:var(--muted);}
+
+        .plan-limit{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);border-radius:8px;padding:10px 14px;font-size:12px;color:#f87171;margin-top:10px;display:flex;align-items:center;gap:8px;}
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-ring"><div class="logo-dot"></div></div>
+        OglasIQ
+    </div>
+    <div class="sidebar-nav">
+        <div class="nav-section">Glavno</div>
+        <a class="nav-item active" href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a>
+        <a class="nav-item" href="#"><span class="nav-icon">🔍</span> Moja iskanja<span class="nav-badge">1</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">🔔</span> Obvestila<span class="nav-badge">4</span></a>
+        <a class="nav-item" href="#"><span class="nav-icon">⭐</span> Shranjeni oglasi</a>
+        <div class="nav-section">Račun</div>
+        <a class="nav-item" href="#"><span class="nav-icon">👤</span> Profil</a>
+        <a class="nav-item" href="#"><span class="nav-icon">💳</span> Naročnina</a>
+        <a class="nav-item" href="#"><span class="nav-icon">⚙️</span> Nastavitve</a>
+        <div class="nav-section">Pomoč</div>
+        <a class="nav-item" href="#"><span class="nav-icon">❓</span> Pomoč</a>
+        <a class="nav-item" href="index.html"><span class="nav-icon">🌐</span> Nazaj na stran</a>
+    </div>
+    <div class="sidebar-user">
+        <div class="user-row">
+            <div class="user-av">JN</div>
+            <div>
+                <div class="user-name">Janez Novak</div>
+                <div class="user-plan">Free paket</div>
+            </div>
+            <button class="user-logout" onclick="window.location.href='prijava.html'" title="Odjava">↩</button>
+        </div>
+    </div>
+</div>
+
+<div class="main">
+    <div class="topbar">
+        <div class="topbar-title">Dashboard</div>
+        <div class="topbar-right">
+            <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+            <button class="btn-new" onclick="document.getElementById('url-section').scrollIntoView({behavior:'smooth'})">+ Novo iskanje</button>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Aktivna iskanja</div>
+                <div class="stat-val">1</div>
+                <div class="stat-change">Free: max 1 URL</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Oglasi danes</div>
+                <div class="stat-val">8</div>
+                <div class="stat-change">↑ 3 več kot včeraj</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Skupaj najdenih</div>
+                <div class="stat-val">47</div>
+                <div class="stat-change">Ta teden</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Naslednje osvežitev</div>
+                <div class="stat-val" id="countdown">23:47</div>
+                <div class="stat-change">Free: vsake 24 ur</div>
+            </div>
+        </div>
+
+        <!-- URL ISKANJA -->
+        <div class="url-section" id="url-section">
+            <div class="url-section-title">Moja iskanja</div>
+            <div class="url-section-sub">Pojdi na portal po svoji izbiri, nastavi filtre in prilepi URL v polje spodaj. OglasIQ bo samodejno zaznal portal in kategorijo.</div>
+
+            <div class="url-slots">
+
+                <!-- URL 1 - AKTIVEN -->
+                <div class="url-slot">
+                    <div class="url-slot-header">
+                        <div class="url-slot-num">Iskanje 1</div>
+                        <div class="url-slot-status">
+                            <div class="status-dot on"></div>
+                            <span style="font-size:11px;color:#22c55e;">Aktivno</span>
+                        </div>
+                    </div>
+                    <div class="url-input-row">
+                        <input class="url-input" type="url" placeholder="https://www.avto.net/Ads/results.asp?..." value="https://www.avto.net/Ads/results.asp?znamka=BMW" id="url1">
+                        <button class="url-detect-btn" onclick="zaznaPortal(1)">🔍 Zaznaj</button>
+                    </div>
+                    <div class="detected-info show" id="detected1">
+                        <div class="detected-portal">🇸🇮 Avto.net — Avtomobili</div>
+                        <div class="detected-cat">Kategorija zaznana · Filtri aktivni</div>
+                    </div>
+                    <div class="url-filters show" id="filters1">
+                        <div class="filter-row">
+                            <div class="f-group">
+                                <label>Cena od (€)</label>
+                                <input class="f-input" type="number" placeholder="0" value="5000">
+                            </div>
+                            <div class="f-group">
+                                <label>Cena do (€)</label>
+                                <input class="f-input" type="number" placeholder="50000" value="25000">
+                            </div>
+                            <div class="f-group">
+                                <label>Letnik od</label>
+                                <input class="f-input" type="number" placeholder="2015" value="2017">
+                            </div>
+                        </div>
+                        <div class="filter-row">
+                            <div class="f-group">
+                                <label>Km do</label>
+                                <input class="f-input" type="number" placeholder="200000" value="150000">
+                            </div>
+                            <div class="f-group">
+                                <label>Gorivo</label>
+                                <select class="f-select">
+                                    <option>Vse</option>
+                                    <option selected>Diesel</option>
+                                    <option>Bencin</option>
+                                    <option>Elektrika</option>
+                                    <option>Hibrid</option>
+                                </select>
+                            </div>
+                            <div class="f-group">
+                                <label>Pogon</label>
+                                <select class="f-select">
+                                    <option>Vse</option>
+                                    <option>Sprednji</option>
+                                    <option>Zadnji</option>
+                                    <option selected>4x4 / AWD</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="f-group">
+                            <label>Oprema</label>
+                            <div class="checks-row">
+                                <div class="check-pill on" onclick="this.classList.toggle('on')">LED žarometi</div>
+                                <div class="check-pill on" onclick="this.classList.toggle('on')">Navigacija</div>
+                                <div class="check-pill" onclick="this.classList.toggle('on')">Usnje</div>
+                                <div class="check-pill" onclick="this.classList.toggle('on')">Panorama</div>
+                                <div class="check-pill on" onclick="this.classList.toggle('on')">CarPlay</div>
+                                <div class="check-pill" onclick="this.classList.toggle('on')">Ogrev. sedeži</div>
+                                <div class="check-pill" onclick="this.classList.toggle('on')">360° kamera</div>
+                                <div class="check-pill" onclick="this.classList.toggle('on')">Lane assist</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- URL 2 - ZAKLENJEN (Free) -->
+                <div class="url-slot" style="position:relative;">
+                    <div class="url-slot-header">
+                        <div class="url-slot-num">Iskanje 2</div>
+                        <div class="url-slot-status">
+                            <div class="status-dot off"></div>
+                            <span style="font-size:11px;color:var(--muted);">Zaklenjeno</span>
+                        </div>
+                    </div>
+                    <div class="url-input-row">
+                        <input class="url-input" type="url" placeholder="Dostopno v Starter paketu..." disabled style="opacity:0.4;">
+                        <button class="url-detect-btn" disabled>🔒 Zaklenjeno</button>
+                    </div>
+                    <div class="plan-limit">🔒 Nadgradi na Starter (3€/mes) za 2 iskanja</div>
+                </div>
+
+            </div>
+
+            <button class="save-btn" onclick="shraniIskanje()">💾 Shrani iskanje</button>
+        </div>
+
+        <!-- ZADNJA OBVESTILA -->
+        <div class="section-header">
+            <div class="section-title">Zadnja obvestila</div>
+            <button class="section-link">Vsa obvestila →</button>
+        </div>
+        <div class="obvestila-list">
+            <div class="ob-card novo">
+                <div class="ob-icon">🚗</div>
+                <div>
+                    <div class="ob-title">BMW 320d xDrive <span class="novo-badge">NOVO</span></div>
+                    <div class="ob-meta"><span>2019</span><span>·</span><span>89.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
+                </div>
+                <div>
+                    <div class="ob-price">18.500 €</div>
+                    <div class="ob-portal">🇸🇮 Avto.net</div>
+                    <div class="ob-time">pred 5 min</div>
+                </div>
+            </div>
+            <div class="ob-card novo">
+                <div class="ob-icon">🚗</div>
+                <div>
+                    <div class="ob-title">BMW 318d Touring <span class="novo-badge">NOVO</span></div>
+                    <div class="ob-meta"><span>2020</span><span>·</span><span>112.000 km</span><span>·</span><span>Diesel</span></div>
+                </div>
+                <div>
+                    <div class="ob-price">16.900 €</div>
+                    <div class="ob-portal">🇩🇪 Mobile.de</div>
+                    <div class="ob-time">pred 1 uro</div>
+                </div>
+            </div>
+            <div class="ob-card">
+                <div class="ob-icon">🚗</div>
+                <div>
+                    <div class="ob-title">BMW X3 xDrive20d</div>
+                    <div class="ob-meta"><span>2018</span><span>·</span><span>134.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
+                </div>
+                <div>
+                    <div class="ob-price">22.400 €</div>
+                    <div class="ob-portal">🇦🇹 Willhaben</div>
+                    <div class="ob-time">pred 3 urami</div>
+                </div>
+            </div>
+            <div class="ob-card">
+                <div class="ob-icon">🚗</div>
+                <div>
+                    <div class="ob-title">BMW 325d xDrive</div>
+                    <div class="ob-meta"><span>2017</span><span>·</span><span>178.000 km</span><span>·</span><span>Diesel · 4x4</span></div>
+                </div>
+                <div>
+                    <div class="ob-price">14.800 €</div>
+                    <div class="ob-portal">🇭🇷 Njuskalo.hr</div>
+                    <div class="ob-time">pred 5 urami</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="two-col">
+            <div class="paket-card">
+                <div class="paket-name">Tvoj paket — Free</div>
+                <div class="paket-price">0€ <small>/mesec</small></div>
+                <div class="paket-interval">⏱ Osvežuje vsake 24 ur</div>
+                <ul class="paket-feats">
+                    <li>1 URL iskanje</li>
+                    <li>Email obvestila</li>
+                    <li>Zgodovina 7 dni</li>
+                </ul>
+                <button class="upgrade-btn">⚡ Nadgradi na Starter — 3€/mes</button>
+            </div>
+            <div class="graf-card">
+                <div class="section-title">Oglasi ta teden</div>
+                <div class="graf-bars">
+                    <div class="graf-bar-wrap"><div class="graf-bar" style="height:30%"></div><div class="graf-label">Pon</div></div>
+                    <div class="graf-bar-wrap"><div class="graf-bar" style="height:55%"></div><div class="graf-label">Tor</div></div>
+                    <div class="graf-bar-wrap"><div class="graf-bar" style="height:40%"></div><div class="graf-label">Sre</div></div>
+                    <div class="graf-bar-wrap"><div class="graf-bar" style="height:70%"></div><div class="graf-label">Čet</div></div>
+                    <div class="graf-bar-wrap"><div class="graf-bar" style="height:90%"></div><div class="graf-label">Pet</div></div>
+                    <div class="graf-bar-wrap"><div class="graf-bar" style="height:45%"></div><div class="graf-label">Sob</div></div>
+                    <div class="graf-bar-wrap"><div class="graf-bar" style="height:60%"></div><div class="graf-label">Ned</div></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+const portali = {
+    "avto.net": {ime:"🇸🇮 Avto.net", kat:"Avtomobili"},
+    "bolha.com": {ime:"🇸🇮 Bolha.com", kat:"Splošno"},
+    "nepremicnine.net": {ime:"🇸🇮 Nepremicnine.net", kat:"Nepremičnine"},
+    "njuskalo.hr": {ime:"🇭🇷 Njuskalo.hr", kat:"Avtomobili / Splošno"},
+    "olx.ba": {ime:"🇧🇦 OLX.ba", kat:"Splošno"},
+    "olx.hr": {ime:"🇭🇷 OLX.hr", kat:"Splošno"},
+    "olx.rs": {ime:"🇷🇸 OLX.rs", kat:"Splošno"},
+    "halooglasi.com": {ime:"🇷🇸 Halo Oglasi", kat:"Splošno"},
+    "mobile.de": {ime:"🇩🇪 Mobile.de", kat:"Avtomobili"},
+    "autoscout24": {ime:"🇩🇪 AutoScout24", kat:"Avtomobili"},
+    "willhaben.at": {ime:"🇦🇹 Willhaben", kat:"Splošno"},
+    "subito.it": {ime:"🇮🇹 Subito.it", kat:"Splošno"},
+    "olx.me": {ime:"🇲🇪 OLX.me", kat:"Splošno"},
+};
+
+function zaznaPortal(num) {
+    const url = document.getElementById('url'+num).value.trim();
+    if(!url) { alert('Prosim vnesi URL!'); return; }
+
+    let zaznan = null;
+    for(const [kljuc, vrednost] of Object.entries(portali)) {
+        if(url.includes(kljuc)) { zaznan = vrednost; break; }
+    }
+
+    const detectedEl = document.getElementById('detected'+num);
+    const filtersEl = document.getElementById('filters'+num);
+
+    if(zaznan) {
+        detectedEl.innerHTML = `<div class="detected-portal">${zaznan.ime} — ${zaznan.kat}</div><div class="detected-cat">Portal zaznan · Nastavi filtre spodaj</div>`;
+        detectedEl.classList.add('show');
+        if(filtersEl) filtersEl.classList.add('show');
+    } else {
+        detectedEl.innerHTML = `<div class="detected-portal">✅ URL shranjen</div><div class="detected-cat">Portal ni v seznamu — URL bomo pregledali</div>`;
+        detectedEl.classList.add('show');
+    }
+}
+
+async function shraniIskanje() {
+    const url1 = document.getElementById('url1').value.trim();
+    if(!url1) {
+        alert('Prosim vnesi vsaj en URL!');
+        return;
+    }
+
+    const iskanje = {
+        id: 1,
+        url: url1,
+        paket: "free",
+        aktiven: true,
+        ime: "Moje iskanje 1"
+    };
+
+    try {
+        const r = await fetch('http://localhost:5000/iskanja', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(iskanje)
+        });
+
+        if(r.ok) {
+            const btn = document.querySelector('.save-btn');
+            btn.textContent = '✅ Iskanje shranjeno!';
+            btn.style.background = '#22c55e';
+            setTimeout(() => {
+                btn.textContent = '💾 Shrani iskanje';
+                btn.style.background = '';
+            }, 2000);
+        }
+    } catch(e) {
+        alert('Strežnik ni dosegljiv. Zaženi server.py!');
+    }
+}
+
+let cas = 23*60 + 47;
+function posodobiCountdown() {
+    const ure = Math.floor(cas/60);
+    const min = cas % 60;
+    document.getElementById('countdown').textContent =
+        String(ure).padStart(2,'0') + ':' + String(min).padStart(2,'0');
+    if(cas > 0) cas--;
+}
+posodobiCountdown();
+setInterval(posodobiCountdown, 60000);
+</script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OglasIQ — Pametno iskanje oglasov</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        :root{--bg:#080810;--surface:#0f0f1a;--border:#1a1a2e;--text:#ffffff;--muted:#6b7280;--accent:#5b6cf9;}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+        nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:56px;background:rgba(8,8,16,0.95);border-bottom:1px solid var(--border);position:fixed;top:0;left:0;right:0;backdrop-filter:blur(12px);z-index:100;}
+        .logo{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;}
+        .logo-ring{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--accent);display:flex;align-items:center;justify-content:center;}
+        .logo-dot{width:10px;height:10px;border-radius:50%;border:1px solid var(--accent);}
+        .nav-links{display:flex;gap:28px;}
+        .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;transition:color 0.2s;}
+        .nav-links a:hover{color:var(--text);}
+        .nav-right{display:flex;align-items:center;gap:14px;}
+        .lang-select{background:var(--surface);color:var(--muted);border:1px solid var(--border);padding:5px 10px;border-radius:6px;font-size:13px;cursor:pointer;}
+        .btn-login{color:var(--muted);background:none;border:none;font-size:14px;cursor:pointer;text-decoration:none;}
+        .btn-login:hover{color:var(--text);}
+        .btn-cta{background:var(--accent);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;}
+        .btn-cta:hover{opacity:0.85;}
+
+        .hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden;}
+        .hero-glow{position:absolute;top:15%;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(91,108,249,0.1) 0%,transparent 65%);pointer-events:none;}
+        .badge{display:inline-flex;align-items:center;gap:6px;background:rgba(91,108,249,0.08);border:1px solid rgba(91,108,249,0.18);color:#a5b4fc;padding:5px 14px;border-radius:20px;font-size:12px;margin-bottom:28px;}
+        .badge-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+        .hero h1{font-size:54px;font-weight:700;letter-spacing:-1.5px;line-height:1.1;max-width:680px;margin-bottom:18px;}
+        .hero h1 em{font-style:normal;color:var(--accent);}
+        .hero-sub{font-size:16px;color:var(--muted);max-width:440px;line-height:1.7;margin-bottom:32px;}
+        .hero-btns{display:flex;gap:12px;justify-content:center;margin-bottom:52px;}
+        .btn-primary{background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:10px;font-size:15px;font-weight:500;cursor:pointer;text-decoration:none;}
+        .btn-primary:hover{opacity:0.85;}
+        .btn-secondary{background:transparent;color:var(--muted);border:1px solid var(--border);padding:12px 24px;border-radius:10px;font-size:15px;cursor:pointer;text-decoration:none;}
+        .btn-secondary:hover{color:var(--text);border-color:#333;}
+
+        .tg-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;width:280px;text-align:left;}
+        .tg-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+        .tg-av{width:32px;height:32px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+        .tg-nm{font-size:13px;font-weight:600;}
+        .tg-on{font-size:11px;color:#22c55e;}
+        .tg-msg{background:#1a1a2e;border-radius:10px;padding:12px;font-size:12px;color:#d1d5db;line-height:1.9;}
+        .tg-link{display:block;margin-top:10px;background:var(--accent);color:#fff;text-align:center;padding:8px;border-radius:8px;font-size:12px;font-weight:500;text-decoration:none;}
+
+        .stats{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+        .stat{flex:1;text-align:center;padding:24px;border-right:1px solid var(--border);}
+        .stat:last-child{border-right:none;}
+        .stat-n{font-size:30px;font-weight:700;letter-spacing:-0.5px;}
+        .stat-l{font-size:12px;color:var(--muted);margin-top:4px;}
+
+        .section{max-width:1000px;margin:0 auto;padding:80px 24px;}
+        .sec-tag{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;}
+        .section h2{font-size:34px;font-weight:700;letter-spacing:-0.8px;margin-bottom:10px;}
+        .section p.sub{color:var(--muted);font-size:15px;line-height:1.7;max-width:420px;margin-bottom:40px;}
+        .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+        .step{background:var(--surface);padding:28px;}
+        .step-n{font-size:11px;color:var(--muted);margin-bottom:14px;font-weight:500;}
+        .step h3{font-size:15px;font-weight:600;margin-bottom:8px;}
+        .step p{font-size:13px;color:var(--muted);line-height:1.6;}
+
+        .portali-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:64px 24px;text-align:center;}
+        .portali-wrap h2{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;}
+        .portali-wrap p{color:var(--muted);font-size:14px;margin-bottom:28px;}
+        .portali-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:680px;margin:0 auto;}
+        .p-pill{background:var(--surface);border:1px solid var(--border);color:#9ca3af;padding:7px 16px;border-radius:8px;font-size:13px;transition:all 0.2s;}
+        .p-pill:hover{border-color:#333;color:#fff;}
+
+        /* CENIK */
+        .pricing-wrap{max-width:1100px;margin:0 auto;padding:80px 24px;text-align:center;}
+        .pricing-wrap h2{font-size:34px;font-weight:700;letter-spacing:-0.8px;margin-bottom:8px;}
+        .pricing-wrap>p{color:var(--muted);font-size:15px;margin-bottom:44px;}
+        .pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+        .p-card{background:var(--surface);padding:28px;text-align:left;position:relative;}
+        .p-card.hi{background:#0d0d20;}
+        .p-tag{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:14px;}
+        .p-card.hi .p-tag{color:var(--accent);}
+        .p-price{font-size:36px;font-weight:700;letter-spacing:-1px;margin-bottom:4px;}
+        .p-price small{font-size:13px;color:var(--muted);font-weight:400;}
+        .p-interval{font-size:11px;color:#22c55e;margin-bottom:12px;font-weight:500;}
+        .p-desc{font-size:13px;color:var(--muted);margin-bottom:20px;}
+        .p-feats{list-style:none;margin-bottom:24px;}
+        .p-feats li{font-size:13px;color:#9ca3af;padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+        .p-feats li::before{content:"✓";color:var(--accent);font-size:11px;}
+        .p-feats li.no{color:#4b5563;}
+        .p-feats li.no::before{content:"✗";color:#4b5563;}
+        .p-btn{width:100%;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.2s;text-align:center;display:block;text-decoration:none;}
+        .p-btn:hover{color:#fff;border-color:#444;}
+        .p-btn.acc{background:var(--accent);color:#fff;border-color:var(--accent);}
+        .p-btn.acc:hover{opacity:0.85;}
+        .popular-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:600;padding:3px 12px;border-radius:0 0 8px 8px;white-space:nowrap;}
+
+        /* FAQ */
+        .faq-wrap{max-width:700px;margin:0 auto;padding:0 24px 80px;}
+        .faq-wrap h2{font-size:28px;font-weight:700;letter-spacing:-0.5px;margin-bottom:28px;text-align:center;}
+        .faq-item{border-bottom:1px solid var(--border);padding:16px 0;cursor:pointer;}
+        .faq-q{font-size:14px;font-weight:500;display:flex;justify-content:space-between;align-items:center;}
+        .faq-a{font-size:13px;color:var(--muted);line-height:1.7;margin-top:10px;display:none;}
+        .faq-a.show{display:block;}
+        .faq-arrow{color:var(--muted);transition:transform 0.2s;font-size:12px;}
+        .faq-item.open .faq-arrow{transform:rotate(180deg);}
+
+        footer{border-top:1px solid var(--border);padding:28px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;}
+        .footer-logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;}
+        footer p{font-size:13px;color:var(--muted);}
+        .footer-links{display:flex;gap:20px;}
+        .footer-links a{font-size:13px;color:var(--muted);text-decoration:none;}
+        .footer-links a:hover{color:#fff;}
+
+        @media(max-width:768px){
+            nav{padding:0 20px;}
+            .nav-links{display:none;}
+            .hero h1{font-size:36px;}
+            .steps{grid-template-columns:1fr;}
+            .pricing-grid{grid-template-columns:1fr 1fr;}
+            .stats{flex-wrap:wrap;}
+            .stat{min-width:50%;}
+            footer{padding:24px 20px;flex-direction:column;text-align:center;}
+        }
+        @media(max-width:480px){
+            .pricing-grid{grid-template-columns:1fr;}
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">
+        <div class="logo-ring"><div class="logo-dot"></div></div>
+        OglasIQ
+    </div>
+    <div class="nav-links">
+        <a href="#kako">Kako deluje</a>
+        <a href="#portali">Portali</a>
+        <a href="#cenik">Cenik</a>
+        <a href="#faq">FAQ</a>
+        <a href="#onas">O nas</a>
+    </div>
+    <div class="nav-right">
+        <select class="lang-select" onchange="zamenjajJezik(this.value)">
+            <option value="sl">🇸🇮 SLO</option>
+            <option value="hr">🇭🇷 HR</option>
+            <option value="ba">🇧🇦 BA</option>
+            <option value="rs">🇷🇸 RS</option>
+            <option value="de">🇩🇪 DE</option>
+            <option value="en">🇬🇧 EN</option>
+        </select>
+        <a href="prijava.html" class="btn-login">Prijava</a>
+        <a href="registracija.html" class="btn-cta">Začni brezplačno</a>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-glow"></div>
+    <div class="badge"><div class="badge-dot"></div> Pregledujemo portale vsake 20 minut</div>
+    <h1>Pametno iskanje<br><em>oglasov po Evropi</em></h1>
+    <p class="hero-sub">Nastavi enkrat. OglasIQ bdi namesto tebe in te takoj obvesti, ko se pojavi oglas ki te zanima.</p>
+    <div class="hero-btns">
+        <a href="registracija.html" class="btn-primary">Začni brezplačno →</a>
+        <a href="#kako" class="btn-secondary">Kako deluje?</a>
+    </div>
+    <div class="tg-card">
+        <div class="tg-head">
+            <div class="tg-av">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path d="M2 8l4 4 8-8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div>
+                <div class="tg-nm">OglasIQ</div>
+                <div class="tg-on">● aktivno</div>
+            </div>
+        </div>
+        <div class="tg-msg">
+            🔔 <strong>Nov oglas</strong><br>
+            🚗 BMW 320d, 2019, 89.000km<br>
+            💰 <strong>18.500 €</strong><br>
+            🌐 Avto.net · pred 2 min
+        </div>
+        <a href="registracija.html" class="tg-link">Poglej oglas →</a>
+    </div>
+</section>
+
+<div class="stats">
+    <div class="stat"><div class="stat-n">12+</div><div class="stat-l">Portalov</div></div>
+    <div class="stat"><div class="stat-n">20 min</div><div class="stat-l">Min. interval</div></div>
+    <div class="stat"><div class="stat-n">6+</div><div class="stat-l">Držav</div></div>
+    <div class="stat"><div class="stat-n">24/7</div><div class="stat-l">Aktivno</div></div>
+</div>
+
+<section class="section" id="kako">
+    <div class="sec-tag">Kako deluje</div>
+    <h2>Tri koraki do prvega obvestila</h2>
+    <p class="sub">Nastavi iskanje enkrat. OglasIQ dela namesto tebe 24 ur na dan.</p>
+    <div class="steps">
+        <div class="step">
+            <div class="step-n">01</div>
+            <h3>Vnesi URL</h3>
+            <p>Pojdi na portal po svojem izboru, nastavi filtre in prilepi URL v OglasIQ. Do 5 URL-jev hkrati.</p>
+        </div>
+        <div class="step">
+            <div class="step-n">02</div>
+            <h3>OglasIQ bdi</h3>
+            <p>Sistem samodejno zazna portal in kategorijo ter preverja nove oglase glede na tvoj paket.</p>
+        </div>
+        <div class="step">
+            <div class="step-n">03</div>
+            <h3>Prejmi obvestilo</h3>
+            <p>Takoj ko se pojavi nov oglas ti pride sporočilo na Telegram z direktnim linkom do oglasa.</p>
+        </div>
+    </div>
+</section>
+
+<div class="portali-wrap" id="portali">
+    <div class="sec-tag">Podprti portali</div>
+    <h2>Vse na enem mestu</h2>
+    <p>Podpiramo vse največje portale v regiji — in jih stalno dodajamo</p>
+    <div class="portali-grid">
+        <div class="p-pill">🇸🇮 Bolha.com</div>
+        <div class="p-pill">🇸🇮 Avto.net</div>
+        <div class="p-pill">🇸🇮 Nepremicnine.net</div>
+        <div class="p-pill">🇭🇷 Njuskalo.hr</div>
+        <div class="p-pill">🇭🇷 OLX.hr</div>
+        <div class="p-pill">🇧🇦 OLX.ba</div>
+        <div class="p-pill">🇷🇸 Halo Oglasi</div>
+        <div class="p-pill">🇷🇸 KupujemProdajem</div>
+        <div class="p-pill">🇩🇪 Mobile.de</div>
+        <div class="p-pill">🇩🇪 AutoScout24</div>
+        <div class="p-pill">🇦🇹 Willhaben</div>
+        <div class="p-pill">🇨🇭 AutoScout24 CH</div>
+        <div class="p-pill">🇮🇹 Subito.it</div>
+        <div class="p-pill">🇲🇪 OLX.me</div>
+    </div>
+</div>
+
+<section class="pricing-wrap" id="cenik">
+    <div class="sec-tag">Cenik</div>
+    <h2>Enostavne cene</h2>
+    <p>Začni brezplačno. Nadgradi kadarkoli. Brez vezave.</p>
+    <div class="pricing-grid">
+
+        <div class="p-card">
+            <div class="p-tag">Free</div>
+            <div class="p-price">0€ <small>/mes</small></div>
+            <div class="p-interval">⏱ Osvežuje vsake 24 ur</div>
+            <div class="p-desc">Za preizkus platforme</div>
+            <ul class="p-feats">
+                <li>1 URL iskanje</li>
+                <li>Osnovna kategorija</li>
+                <li>Email obvestila</li>
+                <li>Zgodovina 7 dni</li>
+                <li class="no">Telegram obvestila</li>
+                <li class="no">Napredni filtri</li>
+                <li class="no">Shranjevanje oglasov</li>
+            </ul>
+            <a href="registracija.html" class="p-btn">Začni brezplačno</a>
+        </div>
+
+        <div class="p-card">
+            <div class="p-tag">Starter</div>
+            <div class="p-price">3€ <small>/mes</small></div>
+            <div class="p-interval">⏱ Osvežuje vsake 3 ure</div>
+            <div class="p-desc">Za začetnike</div>
+            <ul class="p-feats">
+                <li>2 URL iskanja</li>
+                <li>Vse kategorije</li>
+                <li>Telegram + Email</li>
+                <li>Zgodovine 30 dni</li>
+                <li>Osnovni filtri</li>
+                <li class="no">Napredni filtri</li>
+                <li class="no">Shranjevanje oglasov</li>
+            </ul>
+            <a href="registracija.html" class="p-btn">Začni s Starter</a>
+        </div>
+
+        <div class="p-card hi">
+            <div class="popular-badge">Najbolj priljubljen</div>
+            <div class="p-tag">Pro</div>
+            <div class="p-price">7€ <small>/mes</small></div>
+            <div class="p-interval">⏱ Osvežuje vsako uro</div>
+            <div class="p-desc">Za resne iskalce</div>
+            <ul class="p-feats">
+                <li>4 URL iskanja</li>
+                <li>Vse kategorije</li>
+                <li>Telegram + Email</li>
+                <li>Zgodovina 90 dni</li>
+                <li>Vsi filtri</li>
+                <li>Shranjevanje oglasov</li>
+                <li>Obvestilo o spremembi cene</li>
+            </ul>
+            <a href="registracija.html" class="p-btn acc">Začni s Pro</a>
+        </div>
+
+        <div class="p-card">
+            <div class="p-tag">Premium</div>
+            <div class="p-price">15€ <small>/mes</small></div>
+            <div class="p-interval">⏱ Osvežuje vsake 20 min</div>
+            <div class="p-desc">Za profesionalce</div>
+            <ul class="p-feats">
+                <li>5 URL iskanj</li>
+                <li>Vse kategorije</li>
+                <li>Telegram + Email</li>
+                <li>Neomejena zgodovina</li>
+                <li>Vsi filtri + napredni</li>
+                <li>Shranjevanje oglasov</li>
+                <li>Obvestilo o spremembi cene</li>
+            </ul>
+            <a href="registracija.html" class="p-btn">Začni s Premium</a>
+        </div>
+
+    </div>
+</section>
+
+<div class="faq-wrap" id="faq">
+    <h2>Pogosta vprašanja</h2>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Kako deluje OglasIQ? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">OglasIQ je orodje za produktivnost. Ti vpišeš URL iskanja s portala po svojem izboru, naš sistem pa samodejno preverja ali so se pojavili novi oglasi in te obvesti na Telegram ali Email.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Kateri portali so podprti? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Podpiramo vse večje portale v Sloveniji, Hrvaški, Bosni, Srbiji, Nemčiji, Avstriji, Švici in Italiji. Seznam stalno dopolnjujemo. Ker ti sam vneseš URL, sistem deluje z večino javno dostopnih portalov.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Ali OglasIQ shranjuje moje podatke? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Shranjujemo samo ID-je oglasov da ne dobivate dvojnih obvestil, ter direktne linke do oglasov v vašem profilu. Ne shranjujemo slik, opisov ali osebnih podatkov prodajalcev.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Ali lahko kadarkoli prekinem naročnino? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Da, kadarkoli. Brez vezave, brez skritih stroškov. Naročnino prekineš v svojem profilu z enim klikom.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Zakaj je osveževanje omejeno? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Razumni intervali osveževanja zagotavljajo stabilno delovanje sistema in spoštovanje portalov ki jih pregledujemo. Premium paket osvežuje vsake 20 minut kar je dovolj hitro da ne zamudite nobenega oglasa.</div>
+    </div>
+
+    <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Kako nastavim Telegram obvestila? <span class="faq-arrow">▼</span></div>
+        <div class="faq-a">Po registraciji te vodimo skozi enostavno 2-minutno nastavitev Telegram bota. Poiščeš @OglasIQbot na Telegramu, klikneš Start in vse je nastavljeno.</div>
+    </div>
+</div>
+
+<footer id="onas">
+    <div class="footer-logo">
+        <div class="logo-ring"><div class="logo-dot"></div></div>
+        OglasIQ
+    </div>
+    <p>© 2026 OglasIQ. Vse pravice pridržane.</p>
+    <div class="footer-links">
+        <a href="#">Pogoji uporabe</a>
+        <a href="#">Zasebnost</a>
+        <a href="#">Pomoč</a>
+        <a href="mailto:info@oglasiq.com">info@oglasiq.com</a>
+    </div>
+</footer>
+
+<script>
+function zamenjajJezik(j){
+    const t={
+        sl:["Pametno iskanje","oglasov po Evropi","Nastavi enkrat. OglasIQ bdi namesto tebe.","Začni brezplačno →","Kako deluje?"],
+        hr:["Pametna pretraga","oglasa po Europi","Postavi jednom. OglasIQ pazi umjesto tebe.","Počni besplatno →","Kako funkcionira?"],
+        ba:["Pametna pretraga","oglasa po Europi","Postavi jednom. OglasIQ pazi umjesto tebe.","Počni besplatno →","Kako radi?"],
+        rs:["Pametna pretraga","oglasa po Evropi","Postavi jednom. OglasIQ pazi umjesto tebe.","Počni besplatno →","Kako funkcioniše?"],
+        de:["Intelligente Suche","nach Inseraten in Europa","Einmal einrichten. OglasIQ sucht für dich.","Kostenlos starten →","Wie funktioniert es?"],
+        en:["Smart search","for listings across Europe","Set up once. OglasIQ watches for you.","Start for free →","How it works?"]
+    };
+    if(t[j]){
+        document.querySelector('.hero h1').innerHTML=t[j][0]+'<br><em>'+t[j][1]+'</em>';
+        document.querySelector('.hero-sub').textContent=t[j][2];
+        const b=document.querySelectorAll('.hero-btns a');
+        b[0].textContent=t[j][3];b[1].textContent=t[j][4];
+    }
+}
+
+function toggleFaq(el){
+    el.classList.toggle('open');
+    el.querySelector('.faq-a').classList.toggle('show');
+}
+</script>
+</body>
+</html>
