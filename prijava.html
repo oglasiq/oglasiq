@@ -26,7 +26,7 @@
         .form-input::placeholder{color:#374151;}
         .password-wrap{position:relative;}
         .password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;}
-        .remember-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+        .remember-row{display:flex;align-items:center;margin-bottom:20px;}
         .remember-check{display:flex;align-items:center;gap:8px;cursor:pointer;}
         .remember-check input{accent-color:var(--accent);cursor:pointer;}
         .remember-check span{font-size:13px;color:var(--muted);}
@@ -46,11 +46,8 @@
         .success-msg.show{display:block;}
         .loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin-right:8px;vertical-align:middle;}
         @keyframes spin{to{transform:rotate(360deg);}}
-
-        /* RESET GESLA */
         .reset-wrap{display:none;}
         .reset-wrap.show{display:block;}
-
         footer{padding:20px 48px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
         footer p{font-size:12px;color:var(--muted);}
         footer a{color:var(--muted);text-decoration:none;font-size:12px;}
@@ -69,42 +66,33 @@
 
 <div class="main">
     <div class="card">
-
-        <!-- PRIJAVA -->
         <div id="login-form">
             <div class="card-title">Dobrodošel nazaj 👋</div>
             <div class="card-sub">Prijavi se v svoj OglasIQ račun.</div>
-
             <div class="error-msg" id="error-login"></div>
             <div class="success-msg" id="success-login"></div>
-
             <div class="form-group">
                 <label class="form-label">Email naslov</label>
                 <input class="form-input" type="email" placeholder="janez@gmail.com" id="email" onkeydown="if(event.key==='Enter')prijava()">
             </div>
-
             <div class="form-group">
                 <label class="form-label">
                     Geslo
-                    <a href="#" onclick="pokaziReset()">Pozabljeno geslo?</a>
+                    <a href="#" onclick="pokaziReset();return false;">Pozabljeno geslo?</a>
                 </label>
                 <div class="password-wrap">
                     <input class="form-input" type="password" placeholder="Tvoje geslo" id="geslo" onkeydown="if(event.key==='Enter')prijava()">
                     <button class="password-toggle" onclick="togglePassword()">👁</button>
                 </div>
             </div>
-
             <div class="remember-row">
                 <label class="remember-check">
                     <input type="checkbox" id="remember" checked>
                     <span>Zapomni si me</span>
                 </label>
             </div>
-
             <button class="btn-submit" id="btn-prijava" onclick="prijava()">Prijava →</button>
-
             <div class="divider"><div class="divider-line"></div><span>ali</span><div class="divider-line"></div></div>
-
             <button class="social-btn" onclick="alert('Google prijava bo dodana kmalu!')">
                 <svg width="18" height="18" viewBox="0 0 24 24">
                     <path fill="#4285f4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -114,15 +102,13 @@
                 </svg>
                 Prijava z Google
             </button>
-
             <div class="register-link">Nimaš računa? <a href="registracija.html">Registriraj se brezplačno</a></div>
         </div>
 
-        <!-- RESET GESLA -->
         <div class="reset-wrap" id="reset-form">
-            <button class="btn-submit" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;text-align:left;padding:0;width:auto;" onclick="skrijiReset()">← Nazaj</button>
+            <button style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:16px;padding:0;" onclick="skrijiReset()">← Nazaj</button>
             <div class="card-title">Ponastavi geslo</div>
-            <div class="card-sub">Vpiši svoj email in poslali ti bomo povezavo za ponastavitev gesla.</div>
+            <div class="card-sub">Vpiši email in poslali ti bomo navodila za ponastavitev.</div>
             <div class="error-msg" id="error-reset"></div>
             <div class="success-msg" id="success-reset"></div>
             <div class="form-group">
@@ -131,7 +117,6 @@
             </div>
             <button class="btn-submit" id="btn-reset" onclick="posljiReset()">Pošlji navodila →</button>
         </div>
-
     </div>
 </div>
 
@@ -144,19 +129,27 @@
     </div>
 </footer>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
 <script>
 const SUPABASE_URL = 'https://mzcygmkvqqmsoufptinm.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16Y3lnbWt2cXFtc291ZnB0aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2OTY2MDMsImV4cCI6MjA5MjI3MjYwM30.u0UWS-URLgUu9zifPR197S-tRCpGJAIf-9XYJlHCLbA';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Preveri če je user že prijavljen
-window.addEventListener('load', async () => {
-    const { data: { session } } = await sb.auth.getSession();
-    if(session) window.location.href = 'dashboard.html';
-});
+let sb = null;
+
+// Naloži Supabase dinamično
+const script = document.createElement('script');
+script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js';
+script.onload = function() {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    // Preveri sesijo
+    sb.auth.getSession().then(({ data: { session } }) => {
+        if(session) window.location.href = 'dashboard.html';
+    });
+};
+document.head.appendChild(script);
 
 async function prijava() {
+    if(!sb) { alert('Stran se še nalaga, počakaj sekundo!'); return; }
+
     const email = document.getElementById('email').value.trim();
     const geslo = document.getElementById('geslo').value;
     const error = document.getElementById('error-login');
@@ -172,81 +165,47 @@ async function prijava() {
     btn.disabled = true;
     btn.innerHTML = '<span class="loading-spinner"></span>Prijavljam...';
 
-    try {
-        const { data, error: authError } = await sb.auth.signInWithPassword({
-            email: email,
-            password: geslo
-        });
+    const { data, error: authError } = await sb.auth.signInWithPassword({ email, password: geslo });
 
-        if(authError) {
-            let msg = 'Napačen email ali geslo.';
-            if(authError.message.includes('Invalid login')) msg = 'Napačen email ali geslo.';
-            if(authError.message.includes('Email not confirmed')) msg = 'Email ni potrjen. Preveri svojo pošto.';
-            if(authError.message.includes('Too many requests')) msg = 'Preveč poskusov. Počakaj minuto.';
-            error.textContent = msg;
-            error.classList.add('show');
-            btn.disabled = false;
-            btn.innerHTML = 'Prijava →';
-            return;
-        }
-
-        // Shrani podatke v localStorage za dashboard
-        if(data.user) {
-            localStorage.setItem('oglasiq_user_id', data.user.id);
-            localStorage.setItem('oglasiq_user_email', data.user.email);
-            
-            // Potegni paket iz baze
-            const { data: uporabnik } = await sb.from('uporabniki')
-                .select('paket, ime, priimek, notif')
-                .eq('id', data.user.id)
-                .single();
-            
-            if(uporabnik) {
-                localStorage.setItem('oglasiq_paket', uporabnik.paket || 'free');
-                localStorage.setItem('oglasiq_ime', uporabnik.ime || '');
-                localStorage.setItem('oglasiq_priimek', uporabnik.priimek || '');
-            }
-        }
-
-        // Preusmeri na dashboard
-        window.location.href = 'dashboard.html';
-
-    } catch(e) {
-        error.textContent = 'Napaka: ' + e.message;
+    if(authError) {
+        let msg = 'Napačen email ali geslo.';
+        if(authError.message.includes('Email not confirmed')) msg = 'Email ni potrjen. Preveri pošto.';
+        if(authError.message.includes('Too many')) msg = 'Preveč poskusov. Počakaj minuto.';
+        error.textContent = msg;
         error.classList.add('show');
         btn.disabled = false;
         btn.innerHTML = 'Prijava →';
+        return;
     }
+
+    if(data.user) {
+        localStorage.setItem('oglasiq_user_id', data.user.id);
+        localStorage.setItem('oglasiq_user_email', data.user.email);
+        const { data: u } = await sb.from('uporabniki').select('paket,ime,priimek').eq('id', data.user.id).single();
+        if(u) {
+            localStorage.setItem('oglasiq_paket', u.paket || 'free');
+            localStorage.setItem('oglasiq_ime', u.ime || '');
+            localStorage.setItem('oglasiq_priimek', u.priimek || '');
+        }
+    }
+    window.location.href = 'dashboard.html';
 }
 
 async function posljiReset() {
+    if(!sb) { alert('Stran se še nalaga!'); return; }
     const email = document.getElementById('reset-email').value.trim();
     const error = document.getElementById('error-reset');
     const success = document.getElementById('success-reset');
     const btn = document.getElementById('btn-reset');
-
-    if(!email) {
-        error.textContent = 'Vnesi email naslov.';
-        error.classList.add('show');
-        return;
-    }
+    if(!email) { error.textContent = 'Vnesi email.'; error.classList.add('show'); return; }
     error.classList.remove('show');
-
     btn.disabled = true;
     btn.innerHTML = '<span class="loading-spinner"></span>Pošiljam...';
-
-    const { error: resetError } = await sb.auth.resetPasswordForEmail(email, {
+    const { error: e } = await sb.auth.resetPasswordForEmail(email, {
         redirectTo: 'https://oglasiq.github.io/oglasiq/prijava.html'
     });
-
-    if(resetError) {
-        error.textContent = 'Napaka pri pošiljanju.';
-        error.classList.add('show');
-    } else {
-        success.textContent = '✅ Email poslan! Preveri svojo pošto.';
-        success.classList.add('show');
-    }
-
+    if(e) { error.textContent = 'Napaka.'; error.classList.add('show'); }
+    else { success.textContent = '✅ Email poslan! Preveri pošto.'; success.classList.add('show'); }
     btn.disabled = false;
     btn.innerHTML = 'Pošlji navodila →';
 }
@@ -255,15 +214,13 @@ function pokaziReset() {
     document.getElementById('login-form').style.display = 'none';
     document.getElementById('reset-form').classList.add('show');
 }
-
 function skrijiReset() {
     document.getElementById('reset-form').classList.remove('show');
     document.getElementById('login-form').style.display = 'block';
 }
-
 function togglePassword() {
-    const input = document.getElementById('geslo');
-    input.type = input.type === 'password' ? 'text' : 'password';
+    const i = document.getElementById('geslo');
+    i.type = i.type === 'password' ? 'text' : 'password';
 }
 </script>
 </body>
