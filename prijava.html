@@ -135,12 +135,10 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 let sb = null;
 
-// Naloži Supabase dinamično
 const script = document.createElement('script');
 script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js';
 script.onload = function() {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    // Preveri sesijo
     sb.auth.getSession().then(({ data: { session } }) => {
         if(session) window.location.href = 'dashboard.html';
     });
@@ -179,13 +177,13 @@ async function prijava() {
     }
 
     if(data.user) {
-        localStorage.setItem('oglasiq_user_id', data.user.id);
-        localStorage.setItem('oglasiq_user_email', data.user.email);
+        // Preberi podatke iz tabele uporabniki
         const { data: u } = await sb.from('uporabniki').select('paket,ime,priimek').eq('id', data.user.id).single();
         if(u) {
-            localStorage.setItem('oglasiq_paket', u.paket || 'free');
-            localStorage.setItem('oglasiq_ime', u.ime || '');
-            localStorage.setItem('oglasiq_priimek', u.priimek || '');
+            // VAŽNO: ključi se morajo ujemati z dashboard.html
+            localStorage.setItem('paket', u.paket || 'free');
+            localStorage.setItem('ime', u.ime || '');
+            localStorage.setItem('priimek', u.priimek || '');
         }
     }
     window.location.href = 'dashboard.html';
