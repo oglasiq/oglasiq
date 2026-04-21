@@ -1,4 +1,3 @@
-import asyncio
 import json
 import os
 import random
@@ -98,8 +97,14 @@ def poslji_telegram(naslov, cena, link, portal, iskanje_ime=""):
     except Exception as e:
         print(f"  ❌ Napaka: {e}")
 
+def fetch_url(url):
+    headers = random.choice(HEADERS_LIST).copy()
+    headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    headers["Accept-Language"] = "sl-SI,sl;q=0.9,en;q=0.8"
+    r = requests.get(url, headers=headers, timeout=15)
+    return BeautifulSoup(r.content, "html.parser")
+
 def preveri_url(iskanje):
-    # Ce ima iskanje vec URLjev jih vse preveri
     urls = iskanje.get("urls", [])
     if not urls:
         url = iskanje.get("url", "")
@@ -116,17 +121,11 @@ def preveri_url(iskanje):
         print(f"\n🔍 Preverjam: {portal}")
         print(f"   URL: {url[:60]}...")
 
-        headers = random.choice(HEADERS_LIST)
-        headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-        headers["Accept-Language"] = "sl-SI,sl;q=0.9,en;q=0.8"
-
         try:
-            r = requests.get(url, headers=headers, timeout=15)
-            soup = BeautifulSoup(r.text, "html.parser")
+            soup = fetch_url(url)
             videni = nalozi_videne()
             novi = 0
 
-            # BOLHA
             if "bolha.com" in url:
                 oglasi = soup.select("article.entity-body")
                 for oglas in oglasi[:10]:
@@ -144,7 +143,6 @@ def preveri_url(iskanje):
                         poslji_telegram(naslov, cena, link, portal, ime)
                         novi += 1
 
-            # NEPREMICNINE
             elif "nepremicnine.net" in url:
                 oglasi = soup.select("div.oglas_container")
                 for oglas in oglasi[:10]:
@@ -163,7 +161,6 @@ def preveri_url(iskanje):
                         poslji_telegram(naslov, cena, link, portal, ime)
                         novi += 1
 
-            # AVTO.NET
             elif "avto.net" in url:
                 oglasi = soup.select("div.GO-Results-Row")
                 for oglas in oglasi[:10]:
@@ -182,7 +179,6 @@ def preveri_url(iskanje):
                         poslji_telegram(naslov, cena, link, portal, ime)
                         novi += 1
 
-            # NJUSKALO
             elif "njuskalo.hr" in url:
                 oglasi = soup.select("li.EntityList-item")
                 for oglas in oglasi[:10]:
@@ -200,7 +196,6 @@ def preveri_url(iskanje):
                         poslji_telegram(naslov, cena, link, portal, ime)
                         novi += 1
 
-            # OLX
             elif "olx." in url:
                 oglasi = soup.select("div[data-cy='l-card'], li[data-cy='l-card']")
                 if not oglasi:
@@ -216,6 +211,24 @@ def preveri_url(iskanje):
                         base = url.split("/")[0] + "//" + url.split("/")[2]
                         link = base + link
                     cena_el = oglas.select_one("p[data-testid='ad-price'], div.price")
+                    cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
+                    if link and link not in videni:
+                        videni.append(link)
+                        poslji_telegram(naslov, cena, link, portal, ime)
+                        novi += 1
+
+            elif "mobile.de" in url:
+                oglasi = soup.select("div.cBox-body--resultitem, article.cBox")
+                for oglas in oglasi[:10]:
+                    naslov_el = oglas.select_one("span.h3-headline, div.headline-block")
+                    link_el = oglas.select_one("a")
+                    if not naslov_el or not link_el:
+                        continue
+                    naslov = naslov_el.get_text(strip=True)
+                    link = link_el.get("href", "")
+                    if link and not link.startswith("http"):
+                        link = "https://www.mobile.de" + link
+                    cena_el = oglas.select_one("div.price-block, span.price-unit")
                     cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
                     if link and link not in videni:
                         videni.append(link)
