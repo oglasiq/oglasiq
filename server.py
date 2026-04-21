@@ -10,8 +10,11 @@ ISKANJA_FILE = "iskanja.json"
 
 def nalozi_iskanja():
     if os.path.exists(ISKANJA_FILE):
-        with open(ISKANJA_FILE, "r") as f:
-            return json.load(f)
+        try:
+            with open(ISKANJA_FILE, "r") as f:
+                return json.load(f)
+        except:
+            return []
     return []
 
 def shrani_iskanja(iskanja):
