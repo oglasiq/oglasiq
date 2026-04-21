@@ -4,7 +4,7 @@ import json
 import os
 
 app = Flask(__name__)
-CORS(app, origins=["https://oglasiq.github.io", "http://localhost"])
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 ISKANJA_FILE = "iskanja.json"
 
@@ -68,6 +68,6 @@ def health():
     return jsonify({"status": "ok", "service": "OglasIQ API"})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     print(f"🚀 OglasIQ strežnik se zaganja na portu {port}...")
     app.run(debug=False, host="0.0.0.0", port=port)

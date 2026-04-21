@@ -204,12 +204,12 @@
     </div>
     <div class="sidebar-bottom">
         <div class="user-row">
-            <div class="user-av">JN</div>
+            <div class="user-av" id="user-av">...</div>
             <div>
-                <div class="user-name">Janez Novak</div>
-                <div class="user-plan">Free paket</div>
+                <div class="user-name" id="user-name">Nalagam...</div>
+                <div class="user-plan" id="user-plan">...</div>
             </div>
-            <button class="user-logout" onclick="window.location.href='prijava.html'" title="Odjava">↩</button>
+            <button class="user-logout" onclick="odjava()" title="Odjava">↩</button>
         </div>
     </div>
 </div>
@@ -230,7 +230,7 @@
             <div class="stat-card">
                 <div class="stat-label">Aktivna iskanja</div>
                 <div class="stat-val">1</div>
-                <div class="stat-sub">Free: max 1 iskanje</div>
+                <div class="stat-sub" id="stat-iskanja-sub">Free: max 1 iskanje</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Oglasi danes</div>
@@ -245,7 +245,7 @@
             <div class="stat-card">
                 <div class="stat-label">Naslednja osvežitev</div>
                 <div class="stat-val" id="countdown">23:47</div>
-                <div class="stat-sub warn">Free: vsake 24 ur</div>
+                <div class="stat-sub warn" id="stat-interval-sub">Free: vsake 24 ur</div>
             </div>
         </div>
 
@@ -271,14 +271,10 @@
                     </div>
                 </div>
                 <div class="iskanje-body open" id="body1">
-
-                    <!-- SCRAPER STATUS -->
                     <div class="scraper-status caka" id="scraper-status1">
                         <div class="scraper-dot pulse"></div>
                         <span>Čaka na prvo preverjanje — shrani iskanje za začetek</span>
                     </div>
-
-                    <!-- KATEGORIJA -->
                     <div class="section-label">1. Kaj iščeš?</div>
                     <div class="kat-grid" id="kat-grid1">
                         <div class="kat-pill selected" onclick="izberKat(1,'avto')" data-kat="avto"><span class="kat-icon">🚗</span> Avtomobili</div>
@@ -291,16 +287,10 @@
                         <div class="kat-pill" onclick="izberKat(1,'kmetijstvo')" data-kat="kmetijstvo"><span class="kat-icon">🚜</span> Kmetijska meh.</div>
                         <div class="kat-pill" onclick="izberKat(1,'splosno')" data-kat="splosno"><span class="kat-icon">📦</span> Splošno</div>
                     </div>
-
                     <div class="divider"></div>
-
-                    <!-- PORTALI -->
                     <div class="section-label">2. Kje iskati?</div>
                     <div class="portali-regije" id="portali1"></div>
-
                     <div class="divider"></div>
-
-                    <!-- LOKACIJA -->
                     <div class="section-label">3. Lokacija <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;">(neobvezno)</span></div>
                     <div class="lokacija-row">
                         <div class="f-group">
@@ -322,10 +312,7 @@
                             </select>
                         </div>
                     </div>
-
                     <div class="divider"></div>
-
-                    <!-- FILTRI -->
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
                         <div class="section-label" style="margin:0;">4. Filtri</div>
                         <div class="nacin-toggle">
@@ -333,16 +320,14 @@
                             <button class="nacin-btn" id="btn-napredno1" onclick="nacinIskanja(1,'napredno')">⚙️ Napredno</button>
                         </div>
                     </div>
-
-                    <div id="filtri-osnovno1"><!-- generirano --></div>
-                    <div id="filtri-napredno1" class="napredno-section"><!-- generirano --></div>
-
+                    <div id="filtri-osnovno1"></div>
+                    <div id="filtri-napredno1" class="napredno-section"></div>
                     <button class="save-iskanje-btn" onclick="shraniIskanje(1)">💾 Shrani iskanje</button>
                 </div>
             </div>
 
             <!-- ISKANJE 2 - ZAKLENJENO -->
-            <div class="iskanje-card locked">
+            <div class="iskanje-card locked" id="card2">
                 <div class="iskanje-header">
                     <div class="iskanje-header-left">
                         <div class="iskanje-num locked-num">2</div>
@@ -410,15 +395,15 @@
         <!-- PAKET + GRAF -->
         <div class="two-col">
             <div class="paket-card">
-                <div class="paket-name">Tvoj paket — Free</div>
-                <div class="paket-price">0€ <small>/mesec</small></div>
-                <div class="paket-interval">⏱ Osvežuje vsake 24 ur</div>
-                <ul class="paket-feats">
+                <div class="paket-name" id="paket-naziv">Tvoj paket — Free</div>
+                <div class="paket-price" id="paket-cena">0€ <small>/mesec</small></div>
+                <div class="paket-interval" id="paket-interval">⏱ Osvežuje vsake 24 ur</div>
+                <ul class="paket-feats" id="paket-feats">
                     <li>1 iskanje</li>
                     <li>Email obvestila</li>
                     <li>Zgodovina 7 dni</li>
                 </ul>
-                <button class="upgrade-btn">⚡ Nadgradi na Starter — 3€/mes</button>
+                <button class="upgrade-btn" id="upgrade-btn">⚡ Nadgradi na Starter — 3€/mes</button>
             </div>
             <div class="graf-card">
                 <div class="section-title">Oglasi ta teden</div>
@@ -438,8 +423,139 @@
 </div>
 
 <script>
-const PAKET = 'free';
+// ═══════════════════════════════════════════
+// SUPABASE
+// ═══════════════════════════════════════════
+const SUPABASE_URL = 'https://mzcygmkvqqmsoufptinm.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16Y3lnbWt2cXFtc291ZnB0aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2OTY2MDMsImV4cCI6MjA5MjI3MjYwM30.u0UWS-URLgUu9zifPR197S-tRCpGJAIf-9XYJlHCLbA';
+let supabaseClient = null;
 
+function naloziSupabase() {
+    return new Promise((resolve) => {
+        if (window.supabase) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            resolve(); return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js';
+        script.onload = () => {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            resolve();
+        };
+        document.head.appendChild(script);
+    });
+}
+
+// ═══════════════════════════════════════════
+// PAKETI KONFIGURACIJA
+// ═══════════════════════════════════════════
+const PAKETI_CONFIG = {
+    free:    { ime:'Free',    cena:'0€',  maxIskanj:1, interval:'24 ur',  feats:['1 iskanje','Email obvestila','Zgodovina 7 dni'], upgrade:'⚡ Nadgradi na Starter — 3€/mes' },
+    starter: { ime:'Starter', cena:'3€',  maxIskanj:2, interval:'3 ure',  feats:['2 iskanja','Telegram + Email','Zgodovina 30 dni'], upgrade:'⚡ Nadgradi na Pro — 7€/mes' },
+    pro:     { ime:'Pro',     cena:'7€',  maxIskanj:4, interval:'1 uro',  feats:['4 iskanja','Telegram + Email','Zgodovina 90 dni','Shranjevanje oglasov','Obvestilo o spremembi cene'], upgrade:'⚡ Nadgradi na Premium — 15€/mes' },
+    premium: { ime:'Premium', cena:'15€', maxIskanj:5, interval:'20 min', feats:['5 iskanj','Telegram + Email','Neomejena zgodovina','Vse funkcije'], upgrade:'✅ Najvišji paket — hvala!' }
+};
+
+// ═══════════════════════════════════════════
+// NALOŽI UPORABNIKA
+// ═══════════════════════════════════════════
+async function naloziUporabnika() {
+    await naloziSupabase();
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session && session.user) {
+        const user = session.user;
+        const meta = user.user_metadata || {};
+        let ime = meta.ime || localStorage.getItem('ime') || '';
+        let priimek = meta.priimek || localStorage.getItem('priimek') || '';
+        let paket = meta.paket || localStorage.getItem('paket') || 'free';
+
+        // Poskusi prebrati svežje podatke iz tabele uporabniki
+        try {
+            const { data: profil } = await supabaseClient
+                .from('uporabniki')
+                .select('ime, priimek, paket')
+                .eq('id', user.id)
+                .single();
+            if (profil) {
+                ime = profil.ime || ime;
+                priimek = profil.priimek || priimek;
+                paket = profil.paket || paket;
+            }
+        } catch(e) { /* fallback na metadata */ }
+
+        nastaviUI(ime, priimek, paket);
+
+    } else {
+        // Ni seje — fallback na localStorage
+        const ime = localStorage.getItem('ime') || '';
+        const priimek = localStorage.getItem('priimek') || '';
+        const paket = localStorage.getItem('paket') || 'free';
+
+        if (!ime && !priimek) {
+            // Ni prijavljen → redirect
+            window.location.href = 'prijava.html';
+            return;
+        }
+        nastaviUI(ime, priimek, paket);
+    }
+}
+
+function nastaviUI(ime, priimek, paket) {
+    const key = (paket || 'free').toLowerCase();
+    const cfg = PAKETI_CONFIG[key] || PAKETI_CONFIG.free;
+
+    // Avatar inicialke
+    const ini = (ime ? ime[0].toUpperCase() : '') + (priimek ? priimek[0].toUpperCase() : '');
+    document.getElementById('user-av').textContent = ini || '?';
+
+    // Ime in paket v sidebaru
+    document.getElementById('user-name').textContent = [ime, priimek].filter(Boolean).join(' ') || 'Uporabnik';
+    document.getElementById('user-plan').textContent = cfg.ime + ' paket';
+
+    // Stats
+    document.getElementById('stat-iskanja-sub').textContent = cfg.ime + ': max ' + cfg.maxIskanj + ' iskanj' + (cfg.maxIskanj === 1 ? 'e' : '');
+    document.getElementById('stat-interval-sub').textContent = cfg.ime + ': vsake ' + cfg.interval;
+
+    // Paket kartica
+    document.getElementById('paket-naziv').textContent = 'Tvoj paket — ' + cfg.ime;
+    document.getElementById('paket-cena').innerHTML = cfg.cena + ' <small>/mesec</small>';
+    document.getElementById('paket-interval').textContent = '⏱ Osvežuje vsake ' + cfg.interval;
+    document.getElementById('upgrade-btn').textContent = cfg.upgrade;
+
+    // Paket features
+    const featsList = document.getElementById('paket-feats');
+    featsList.innerHTML = cfg.feats.map(f => `<li>${f}</li>`).join('');
+
+    // Zakleni/odkleni iskanja glede na paket
+    posodobiZaklepanje(cfg.maxIskanj);
+
+    // Shrani paket globalno za shraniIskanje()
+    window.AKTIVNI_PAKET = key;
+}
+
+function posodobiZaklepanje(maxIskanj) {
+    const card2 = document.getElementById('card2');
+    if (maxIskanj >= 2) {
+        card2.classList.remove('locked');
+    } else {
+        card2.classList.add('locked');
+    }
+}
+
+async function odjava() {
+    await naloziSupabase();
+    await supabaseClient.auth.signOut();
+    localStorage.removeItem('ime');
+    localStorage.removeItem('priimek');
+    localStorage.removeItem('paket');
+    window.location.href = 'prijava.html';
+}
+
+// ═══════════════════════════════════════════
+// PORTALI IN KATEGORIJE
+// ═══════════════════════════════════════════
 const PORTALI_PO_REGIJAH = [
     { regija:'🇸🇮', label:'SLO', portali:[
         {id:'avto.net', ime:'Avto.net', flag:'🇸🇮', kat:['avto','kombi','motor','quad','skuter']},
@@ -528,7 +644,11 @@ function renderPortali(num) {
             chip.className = 'portal-chip';
             chip.dataset.pid = portal.id;
             chip.innerHTML = `<span class="portal-flag">${portal.flag}</span>${portal.ime}`;
-            chip.onclick = () => { chip.classList.toggle('selected'); const idx=state[num].portali.indexOf(portal.id); idx===-1?state[num].portali.push(portal.id):state[num].portali.splice(idx,1); };
+            chip.onclick = () => {
+                chip.classList.toggle('selected');
+                const idx = state[num].portali.indexOf(portal.id);
+                idx === -1 ? state[num].portali.push(portal.id) : state[num].portali.splice(idx, 1);
+            };
             list.appendChild(chip);
         });
     });
@@ -543,9 +663,7 @@ function renderFiltri(num) {
         o.innerHTML = `
         <div class="osnovno-grid">
             <div class="f-group"><div class="f-label">Znamka</div>
-                <select class="f-select" id="f${num}-znamka">
-                    ${ZNAMKE.avto.map(z=>`<option>${z}</option>`).join('')}
-                </select>
+                <select class="f-select" id="f${num}-znamka">${ZNAMKE.avto.map(z=>`<option>${z}</option>`).join('')}</select>
             </div>
             <div class="f-group"><div class="f-label">Model</div>
                 <input class="f-input" type="text" placeholder="npr. 320d, Golf, Passat..." id="f${num}-model">
@@ -558,14 +676,9 @@ function renderFiltri(num) {
             </div>
         </div>
         <div class="osnovno-grid col2" style="margin-top:10px;">
-            <div class="f-group"><div class="f-label">Cena od (€)</div>
-                <input class="f-input" type="number" placeholder="0" id="f${num}-cena-od">
-            </div>
-            <div class="f-group"><div class="f-label">Cena do (€)</div>
-                <input class="f-input" type="number" placeholder="50.000" id="f${num}-cena-do">
-            </div>
+            <div class="f-group"><div class="f-label">Cena od (€)</div><input class="f-input" type="number" placeholder="0" id="f${num}-cena-od"></div>
+            <div class="f-group"><div class="f-label">Cena do (€)</div><input class="f-input" type="number" placeholder="50.000" id="f${num}-cena-do"></div>
         </div>`;
-
         n.innerHTML = `
         <div class="divider"></div>
         <div class="napredno-grid col4" style="margin-bottom:10px;">
@@ -608,7 +721,6 @@ function renderFiltri(num) {
                 ${['Brez poškodb','Servisna knjiga','1. lastnik','Nov avto','Uvoz'].map(o=>`<div class="check-pill" onclick="this.classList.toggle('on')">${o}</div>`).join('')}
             </div>
         </div>`;
-
     } else if(kat === 'motor') {
         o.innerHTML = `
         <div class="osnovno-grid">
@@ -652,7 +764,6 @@ function renderFiltri(num) {
                 ${['ABS','Traction Control','Quickshifter','Ogrevane ročke','Tempomat','Riding modes','TFT zaslon','Bočne torbe'].map(o=>`<div class="check-pill" onclick="this.classList.toggle('on')">${o}</div>`).join('')}
             </div>
         </div>`;
-
     } else if(kat === 'quad') {
         o.innerHTML = `
         <div class="osnovno-grid">
@@ -679,7 +790,6 @@ function renderFiltri(num) {
             </div>
             <div class="f-group"><div class="f-label">Letnik od</div><input class="f-input" type="number" placeholder="2015" id="f${num}-letnik-od"></div>
         </div>`;
-
     } else if(kat === 'skuter') {
         o.innerHTML = `
         <div class="osnovno-grid">
@@ -706,7 +816,6 @@ function renderFiltri(num) {
                 <select class="f-select" id="f${num}-prodajalec"><option value="">Vsi</option><option>Zasebnik</option><option>Trgovec</option></select>
             </div>
         </div>`;
-
     } else if(kat === 'nepremicnina') {
         o.innerHTML = `
         <div class="osnovno-grid">
@@ -748,7 +857,6 @@ function renderFiltri(num) {
                 ${['Balkon','Terasa','Garaža','Parkirno mesto','Dvigalo','Klet','Vrt','Bazen','Klimatizacija','Talno ogrevanje','Alarm'].map(o=>`<div class="check-pill" onclick="this.classList.toggle('on')">${o}</div>`).join('')}
             </div>
         </div>`;
-
     } else if(kat === 'plovilo') {
         o.innerHTML = `
         <div class="osnovno-grid">
@@ -768,7 +876,6 @@ function renderFiltri(num) {
                 <select class="f-select" id="f${num}-gorivo"><option value="">Vse</option><option>Bencin</option><option>Diesel</option><option>Električni</option></select>
             </div>
         </div>`;
-
     } else if(kat === 'kmetijstvo') {
         o.innerHTML = `
         <div class="osnovno-grid">
@@ -791,7 +898,6 @@ function renderFiltri(num) {
             <div class="f-group"><div class="f-label">Ure do</div><input class="f-input" type="number" placeholder="5000" id="f${num}-ure-do"></div>
             <div class="f-group"><div class="f-label">Letnik od</div><input class="f-input" type="number" placeholder="2010" id="f${num}-letnik-od"></div>
         </div>`;
-
     } else {
         o.innerHTML = `
         <div class="osnovno-grid">
@@ -921,12 +1027,12 @@ async function shraniIskanje(num) {
     document.getElementById('card'+num+'-title').textContent = naslov;
     document.getElementById('card'+num+'-sub').textContent = urls.length+' URL-jev · Aktivno';
 
-    // posodobi scraper status
     const statusEl = document.getElementById('scraper-status'+num);
     statusEl.className = 'scraper-status ok';
     statusEl.innerHTML = '<div class="scraper-dot pulse"></div><span>✅ Iskanje aktivno · Scraper bo preveril ob naslednjem ciklu</span>';
 
-    const iskanje = { id:num, url:urls[0], urls:urls, paket:PAKET, aktiven:true, ime:naslov, kat:kat };
+    const paket = window.AKTIVNI_PAKET || 'free';
+    const iskanje = { id:num, url:urls[0], urls:urls, paket:paket, aktiven:true, ime:naslov, kat:kat };
 
     try {
         const r = await fetch('https://clever-beauty-production-3d95.up.railway.app/iskanja', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(iskanje)});
@@ -956,6 +1062,7 @@ posodobiCountdown();
 setInterval(posodobiCountdown, 60000);
 
 // INIT
+naloziUporabnika();
 renderPortali(1);
 renderFiltri(1);
 </script>
