@@ -21,7 +21,7 @@ HEADERS_LIST = [
 INTERVALI = {
     "free": 24 * 60 * 60,
     "starter": 3 * 60 * 60,
-    "pro": 60 * 60,
+    "pro": 60,
     "premium": 20 * 60,
 }
 
@@ -289,7 +289,7 @@ def main():
                 print(f"  ⏳ Iskanje {iid}: čez {minute} min")
 
         print("\n💤 Čakam 5 minut...")
-        time.sleep(300)
+        time.sleep(30)
 
 if __name__ == "__main__":
     main()
