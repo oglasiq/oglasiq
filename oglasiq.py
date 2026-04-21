@@ -5,12 +5,13 @@ import random
 import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
+import time
 
 TELEGRAM_TOKEN = "8522586477:AAE0tasQkHhHGZs8b0m5WtEWor-6J6NUUmw"
 TELEGRAM_CHAT_ID = "1123416623"
 
 VIDENI_OGLASI_FILE = "videni_oglasi.json"
-ISKANJA_FILE = "iskanja.json"
+API_URL = "https://clever-beauty-production-3d95.up.railway.app"
 
 HEADERS_LIST = [
     {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"},
@@ -25,16 +26,6 @@ INTERVALI = {
     "premium": 20 * 60,
 }
 
-PRIVZETA_ISKANJA = [
-    {
-        "id": 1,
-        "url": "https://www.bolha.com/rabljeno?q=zemljisce",
-        "paket": "premium",
-        "aktiven": True,
-        "ime": "Zemljišče test"
-    }
-]
-
 def nalozi_videne():
     if os.path.exists(VIDENI_OGLASI_FILE):
         with open(VIDENI_OGLASI_FILE, "r") as f:
@@ -46,15 +37,18 @@ def shrani_videne(videni):
         json.dump(videni, f)
 
 def nalozi_iskanja():
-    if os.path.exists(ISKANJA_FILE):
-        with open(ISKANJA_FILE, "r") as f:
-            return json.load(f)
-    shrani_iskanja(PRIVZETA_ISKANJA)
-    return PRIVZETA_ISKANJA
-
-def shrani_iskanja(iskanja):
-    with open(ISKANJA_FILE, "w") as f:
-        json.dump(iskanja, f, ensure_ascii=False, indent=2)
+    try:
+        r = requests.get(f"{API_URL}/iskanja", timeout=10)
+        if r.status_code == 200:
+            iskanja = r.json()
+            print(f"  ✅ Naloženih {len(iskanja)} iskanj iz API")
+            return iskanja
+        else:
+            print(f"  ❌ API napaka: {r.status_code}")
+            return []
+    except Exception as e:
+        print(f"  ❌ Ne morem doseči API: {e}")
+        return []
 
 def zazna_portal(url):
     portali = {
@@ -105,139 +99,150 @@ def poslji_telegram(naslov, cena, link, portal, iskanje_ime=""):
         print(f"  ❌ Napaka: {e}")
 
 def preveri_url(iskanje):
-    url = iskanje.get("url", "")
-    portal = zazna_portal(url)
+    # Ce ima iskanje vec URLjev jih vse preveri
+    urls = iskanje.get("urls", [])
+    if not urls:
+        url = iskanje.get("url", "")
+        if url:
+            urls = [url]
+
     ime = iskanje.get("ime", "")
 
-    print(f"\n🔍 Preverjam: {portal}")
-    print(f"   URL: {url[:60]}...")
+    for url in urls:
+        if not url:
+            continue
 
-    headers = random.choice(HEADERS_LIST)
-    headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
-    headers["Accept-Language"] = "sl-SI,sl;q=0.9,en;q=0.8"
+        portal = zazna_portal(url)
+        print(f"\n🔍 Preverjam: {portal}")
+        print(f"   URL: {url[:60]}...")
 
-    try:
-        r = requests.get(url, headers=headers, timeout=15)
-        soup = BeautifulSoup(r.text, "html.parser")
-        videni = nalozi_videne()
-        novi = 0
+        headers = random.choice(HEADERS_LIST)
+        headers["Accept"] = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+        headers["Accept-Language"] = "sl-SI,sl;q=0.9,en;q=0.8"
 
-        # BOLHA
-        if "bolha.com" in url:
-            oglasi = soup.select("article.entity-body")
-            for oglas in oglasi[:10]:
-                naslov_el = oglas.select_one("h3.entity-title a")
-                if not naslov_el:
-                    continue
-                naslov = naslov_el.get_text(strip=True)
-                link = naslov_el.get("href", "")
-                if link and not link.startswith("http"):
-                    link = "https://www.bolha.com" + link
-                cena_el = oglas.select_one("strong.price-box")
-                cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
-                if link and link not in videni:
-                    videni.append(link)
-                    poslji_telegram(naslov, cena, link, portal, ime)
-                    novi += 1
+        try:
+            r = requests.get(url, headers=headers, timeout=15)
+            soup = BeautifulSoup(r.text, "html.parser")
+            videni = nalozi_videne()
+            novi = 0
 
-        # NEPREMICNINE
-        elif "nepremicnine.net" in url:
-            oglasi = soup.select("div.oglas_container")
-            for oglas in oglasi[:10]:
-                naslov_el = oglas.select_one("span.title")
-                link_el = oglas.select_one("a")
-                if not naslov_el or not link_el:
-                    continue
-                naslov = naslov_el.get_text(strip=True)
-                link = link_el.get("href", "")
-                if link and not link.startswith("http"):
-                    link = "https://www.nepremicnine.net" + link
-                cena_el = oglas.select_one("strong.price-box")
-                cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
-                if link and link not in videni:
-                    videni.append(link)
-                    poslji_telegram(naslov, cena, link, portal, ime)
-                    novi += 1
+            # BOLHA
+            if "bolha.com" in url:
+                oglasi = soup.select("article.entity-body")
+                for oglas in oglasi[:10]:
+                    naslov_el = oglas.select_one("h3.entity-title a")
+                    if not naslov_el:
+                        continue
+                    naslov = naslov_el.get_text(strip=True)
+                    link = naslov_el.get("href", "")
+                    if link and not link.startswith("http"):
+                        link = "https://www.bolha.com" + link
+                    cena_el = oglas.select_one("strong.price-box")
+                    cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
+                    if link and link not in videni:
+                        videni.append(link)
+                        poslji_telegram(naslov, cena, link, portal, ime)
+                        novi += 1
 
-        # AVTO.NET
-        elif "avto.net" in url:
-            oglasi = soup.select("div.GO-Results-Row")
-            for oglas in oglasi[:10]:
-                naslov_el = oglas.select_one("div.GO-Results-Naziv")
-                link_el = oglas.select_one("a")
-                if not naslov_el or not link_el:
-                    continue
-                naslov = naslov_el.get_text(strip=True)
-                link = link_el.get("href", "")
-                if link and not link.startswith("http"):
-                    link = "https://www.avto.net" + link
-                cena_el = oglas.select_one("div.GO-Results-Cena")
-                cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
-                if link and link not in videni:
-                    videni.append(link)
-                    poslji_telegram(naslov, cena, link, portal, ime)
-                    novi += 1
+            # NEPREMICNINE
+            elif "nepremicnine.net" in url:
+                oglasi = soup.select("div.oglas_container")
+                for oglas in oglasi[:10]:
+                    naslov_el = oglas.select_one("span.title")
+                    link_el = oglas.select_one("a")
+                    if not naslov_el or not link_el:
+                        continue
+                    naslov = naslov_el.get_text(strip=True)
+                    link = link_el.get("href", "")
+                    if link and not link.startswith("http"):
+                        link = "https://www.nepremicnine.net" + link
+                    cena_el = oglas.select_one("strong.price-box")
+                    cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
+                    if link and link not in videni:
+                        videni.append(link)
+                        poslji_telegram(naslov, cena, link, portal, ime)
+                        novi += 1
 
-        # NJUSKALO
-        elif "njuskalo.hr" in url:
-            oglasi = soup.select("li.EntityList-item")
-            for oglas in oglasi[:10]:
-                naslov_el = oglas.select_one("h3.entity-title a")
-                if not naslov_el:
-                    continue
-                naslov = naslov_el.get_text(strip=True)
-                link = naslov_el.get("href", "")
-                if link and not link.startswith("http"):
-                    link = "https://www.njuskalo.hr" + link
-                cena_el = oglas.select_one("strong.price-box")
-                cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
-                if link and link not in videni:
-                    videni.append(link)
-                    poslji_telegram(naslov, cena, link, portal, ime)
-                    novi += 1
+            # AVTO.NET
+            elif "avto.net" in url:
+                oglasi = soup.select("div.GO-Results-Row")
+                for oglas in oglasi[:10]:
+                    naslov_el = oglas.select_one("div.GO-Results-Naziv")
+                    link_el = oglas.select_one("a")
+                    if not naslov_el or not link_el:
+                        continue
+                    naslov = naslov_el.get_text(strip=True)
+                    link = link_el.get("href", "")
+                    if link and not link.startswith("http"):
+                        link = "https://www.avto.net" + link
+                    cena_el = oglas.select_one("div.GO-Results-Cena")
+                    cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
+                    if link and link not in videni:
+                        videni.append(link)
+                        poslji_telegram(naslov, cena, link, portal, ime)
+                        novi += 1
 
-        # OLX
-        elif "olx." in url:
-            oglasi = soup.select("div[data-cy='l-card'], li[data-cy='l-card']")
-            if not oglasi:
-                oglasi = soup.select("div.item-box")
-            for oglas in oglasi[:10]:
-                naslov_el = oglas.select_one("h3, h4, p[data-cy='ad-card-title']")
-                link_el = oglas.select_one("a")
-                if not naslov_el or not link_el:
-                    continue
-                naslov = naslov_el.get_text(strip=True)
-                link = link_el.get("href", "")
-                if link and not link.startswith("http"):
-                    base = url.split("/")[0] + "//" + url.split("/")[2]
-                    link = base + link
-                cena_el = oglas.select_one("p[data-testid='ad-price'], div.price")
-                cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
-                if link and link not in videni:
-                    videni.append(link)
-                    poslji_telegram(naslov, cena, link, portal, ime)
-                    novi += 1
+            # NJUSKALO
+            elif "njuskalo.hr" in url:
+                oglasi = soup.select("li.EntityList-item")
+                for oglas in oglasi[:10]:
+                    naslov_el = oglas.select_one("h3.entity-title a")
+                    if not naslov_el:
+                        continue
+                    naslov = naslov_el.get_text(strip=True)
+                    link = naslov_el.get("href", "")
+                    if link and not link.startswith("http"):
+                        link = "https://www.njuskalo.hr" + link
+                    cena_el = oglas.select_one("strong.price-box")
+                    cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
+                    if link and link not in videni:
+                        videni.append(link)
+                        poslji_telegram(naslov, cena, link, portal, ime)
+                        novi += 1
 
-        else:
-            # GENERICNI
-            oglasi = soup.select("article, div.item, li.ad")
-            for oglas in oglasi[:10]:
-                naslov_el = oglas.select_one("h2, h3, h4")
-                link_el = oglas.select_one("a")
-                if not naslov_el or not link_el:
-                    continue
-                naslov = naslov_el.get_text(strip=True)
-                link = link_el.get("href", "")
-                if link and link not in videni:
-                    videni.append(link)
-                    poslji_telegram(naslov, "Preveri oglas", link, portal, ime)
-                    novi += 1
+            # OLX
+            elif "olx." in url:
+                oglasi = soup.select("div[data-cy='l-card'], li[data-cy='l-card']")
+                if not oglasi:
+                    oglasi = soup.select("div.item-box")
+                for oglas in oglasi[:10]:
+                    naslov_el = oglas.select_one("h3, h4, p[data-cy='ad-card-title']")
+                    link_el = oglas.select_one("a")
+                    if not naslov_el or not link_el:
+                        continue
+                    naslov = naslov_el.get_text(strip=True)
+                    link = link_el.get("href", "")
+                    if link and not link.startswith("http"):
+                        base = url.split("/")[0] + "//" + url.split("/")[2]
+                        link = base + link
+                    cena_el = oglas.select_one("p[data-testid='ad-price'], div.price")
+                    cena = cena_el.get_text(strip=True) if cena_el else "Cena ni navedena"
+                    if link and link not in videni:
+                        videni.append(link)
+                        poslji_telegram(naslov, cena, link, portal, ime)
+                        novi += 1
 
-        shrani_videne(videni)
-        print(f"  ✅ {portal}: {novi} novih oglasov")
+            else:
+                oglasi = soup.select("article, div.item, li.ad")
+                for oglas in oglasi[:10]:
+                    naslov_el = oglas.select_one("h2, h3, h4")
+                    link_el = oglas.select_one("a")
+                    if not naslov_el or not link_el:
+                        continue
+                    naslov = naslov_el.get_text(strip=True)
+                    link = link_el.get("href", "")
+                    if link and link not in videni:
+                        videni.append(link)
+                        poslji_telegram(naslov, "Preveri oglas", link, portal, ime)
+                        novi += 1
 
-    except Exception as e:
-        print(f"  ❌ Napaka: {e}")
+            shrani_videne(videni)
+            print(f"  ✅ {portal}: {novi} novih oglasov")
+
+        except Exception as e:
+            print(f"  ❌ Napaka pri {portal}: {e}")
+
+        time.sleep(random.uniform(2, 5))
 
 def main():
     print("=" * 50)
@@ -248,7 +253,7 @@ def main():
 
     while True:
         iskanja = nalozi_iskanja()
-        cas_zdaj = __import__("time").time()
+        cas_zdaj = time.time()
 
         print(f"\n⏰ {datetime.now().strftime('%d.%m.%Y %H:%M:%S')}")
         print(f"📋 Naloženih iskanj: {len(iskanja)}")
@@ -264,7 +269,6 @@ def main():
             if cas_zdaj - zadnje >= interval:
                 preveri_url(iskanje)
                 zadnje_preverjanje[iid] = cas_zdaj
-                import time
                 time.sleep(random.uniform(3, 7))
             else:
                 preostalo = int(interval - (cas_zdaj - zadnje))
@@ -272,7 +276,6 @@ def main():
                 print(f"  ⏳ Iskanje {iid}: čez {minute} min")
 
         print("\n💤 Čakam 5 minut...")
-        import time
         time.sleep(300)
 
 if __name__ == "__main__":
