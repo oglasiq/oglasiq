@@ -10,7 +10,7 @@ import time
 TELEGRAM_TOKEN = "8522586477:AAE0tasQkHhHGZs8b0m5WtEWor-6J6NUUmw"
 TELEGRAM_CHAT_ID = "1123416623"
 
-VIDENI_OGLASI_FILE = "videni_oglasi.json"
+VIDENI_OGLASI_FILE = "/tmp/videni_oglasi.json"
 API_URL = "https://clever-beauty-production-3d95.up.railway.app"
 
 HEADERS_LIST = [
