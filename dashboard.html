@@ -949,7 +949,7 @@ function sestaviUrl(pid, num) {
     }
     if(pid==='bolha.com'){
         let q=[znamka!=='Vse znamke'?znamka:'',model].filter(Boolean).join(' ');
-        let url=`https://www.bolha.com/rabljeno?q=${encodeURIComponent(q||'avto')}`;
+        let url=`https://www.bolha.com/?q=${encodeURIComponent(q||'avto')}`;
         if(cenaOd)url+=`&price_from=${cenaOd}`;if(cenaDo)url+=`&price_to=${cenaDo}`;
         if(zip)url+=`&zip=${zip}`;if(razdalja)url+=`&radius=${razdalja}`;
         return url;
