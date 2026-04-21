@@ -127,7 +127,7 @@ def preveri_url(iskanje):
             novi = 0
 
             if "bolha.com" in url:
-                oglasi = soup.select("article.entity-body")
+                oglasi = soup.select("article.entity-body, article.entity-body.cf")
                 for oglas in oglasi[:10]:
                     naslov_el = oglas.select_one("h3.entity-title a")
                     if not naslov_el:
